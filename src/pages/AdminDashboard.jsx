@@ -39,7 +39,9 @@ function formatNaira(value) {
 }
 
 function formatNumber(value) {
-  return new Intl.NumberFormat("en-NG").format(Number(value) || 0);
+  return new Intl.NumberFormat("en-NG").format(
+    Number(value) || 0
+  );
 }
 
 function formatDate(value) {
@@ -49,6 +51,15 @@ function formatDate(value) {
     day: "2-digit",
     month: "short",
     year: "numeric",
+  }).format(new Date(value));
+}
+
+function formatShortDate(value) {
+  if (!value) return "";
+
+  return new Intl.DateTimeFormat("en-NG", {
+    day: "2-digit",
+    month: "short",
   }).format(new Date(value));
 }
 
@@ -108,11 +119,14 @@ function buildChartData(orders, range) {
   const now = new Date();
 
   if (range === "today") {
-    const buckets = Array.from({ length: 24 }, (_, hour) => ({
-      label: `${String(hour).padStart(2, "0")}:00`,
-      revenue: 0,
-      orders: 0,
-    }));
+    const buckets = Array.from(
+      { length: 24 },
+      (_, hour) => ({
+        label: `${String(hour).padStart(2, "0")}:00`,
+        revenue: 0,
+        orders: 0,
+      })
+    );
 
     orders.forEach((order) => {
       const date = new Date(order.created_at);
@@ -141,6 +155,7 @@ function buildChartData(orders, range) {
 
     for (let i = 6; i >= 0; i -= 1) {
       const date = new Date(now);
+
       date.setDate(date.getDate() - i);
       date.setHours(0, 0, 0, 0);
 
@@ -176,6 +191,7 @@ function buildChartData(orders, range) {
 
     for (let i = 29; i >= 0; i -= 1) {
       const date = new Date(now);
+
       date.setDate(date.getDate() - i);
       date.setHours(0, 0, 0, 0);
 
@@ -208,6 +224,7 @@ function buildChartData(orders, range) {
 
   for (let i = 11; i >= 0; i -= 1) {
     const date = new Date(now);
+
     date.setMonth(date.getMonth() - i);
     date.setDate(1);
     date.setHours(0, 0, 0, 0);
@@ -266,29 +283,34 @@ function StatCard({
       <div className="dashboard-stat-bottom">
         <small>{detail}</small>
 
-        {trend !== undefined && trend !== null && (
-          <span
-            className={
-              trend >= 0
-                ? "dashboard-trend positive"
-                : "dashboard-trend negative"
-            }
-          >
-            {trend >= 0 ? (
-              <ArrowUpRight size={13} />
-            ) : (
-              <ArrowDownRight size={13} />
-            )}
+        {trend !== undefined &&
+          trend !== null && (
+            <span
+              className={
+                trend >= 0
+                  ? "dashboard-trend positive"
+                  : "dashboard-trend negative"
+              }
+            >
+              {trend >= 0 ? (
+                <ArrowUpRight size={13} />
+              ) : (
+                <ArrowDownRight size={13} />
+              )}
 
-            {Math.abs(trend)}%
-          </span>
-        )}
+              {Math.abs(trend)}%
+            </span>
+          )}
       </div>
     </article>
   );
 }
 
-function ActivityCard({ label, value, icon: Icon }) {
+function ActivityCard({
+  label,
+  value,
+  icon: Icon,
+}) {
   return (
     <article className="dashboard-activity-card">
       <div className="dashboard-activity-icon">
@@ -310,6 +332,9 @@ export default function AdminDashboard() {
   const [orderItems, setOrderItems] = useState([]);
   const [products, setProducts] = useState([]);
 
+  const [storeEvents, setStoreEvents] = useState([]);
+  const [productLikes, setProductLikes] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
@@ -324,59 +349,139 @@ export default function AdminDashboard() {
     setError("");
 
     try {
-      const [productsResult, ordersResult, itemsResult] =
-        await Promise.all([
-          supabase
-            .from("products")
-            .select("*, categories(id, name, slug)")
-            .order("created_at", {
-              ascending: false,
-            }),
+      const [
+        ordersResult,
+        itemsResult,
+        productsResult,
+        eventsResult,
+        likesResult,
+      ] = await Promise.all([
+        supabase
+          .from("orders")
+          .select("*")
+          .order("created_at", {
+            ascending: false,
+          }),
 
-          supabase
-            .from("orders")
-            .select("*")
-            .order("created_at", {
-              ascending: false,
-            }),
+        supabase
+          .from("order_items")
+          .select("*")
+          .order("created_at", {
+            ascending: false,
+          }),
 
-          supabase
-            .from("order_items")
-            .select("*")
-            .order("created_at", {
-              ascending: false,
-            }),
-        ]);
+        supabase
+          .from("products")
+          .select(
+            "*, categories(id, name, slug)"
+          )
+          .order("created_at", {
+            ascending: false,
+          }),
+
+        supabase
+          .from("store_events")
+          .select("*")
+          .order("created_at", {
+            ascending: false,
+          }),
+
+        supabase
+          .from("product_likes")
+          .select("*")
+          .order("created_at", {
+            ascending: false,
+          }),
+      ]);
 
       if (productsResult.error) {
         throw productsResult.error;
       }
 
-      setProducts(productsResult.data || []);
-
-      if (ordersResult.error) {
-        console.warn(
-          "PENCILBOY orders table is not available yet:",
-          ordersResult.error.message
+      /*
+       * Orders and order_items belong to the Commerce phase.
+       * If those tables do not exist yet, the dashboard
+       * should still load catalogue and inventory data.
+       */
+      const ordersUnavailable =
+        ordersResult.error &&
+        /relation .*orders.* does not exist|could not find the table/i.test(
+          ordersResult.error.message || ""
         );
 
-        setOrders([]);
-      } else {
-        setOrders(ordersResult.data || []);
-      }
-
-      if (itemsResult.error) {
-        console.warn(
-          "PENCILBOY order_items table is not available yet:",
-          itemsResult.error.message
+      const orderItemsUnavailable =
+        itemsResult.error &&
+        /relation .*order_items.* does not exist|could not find the table/i.test(
+          itemsResult.error.message || ""
         );
 
-        setOrderItems([]);
-      } else {
-        setOrderItems(itemsResult.data || []);
+      if (
+        ordersResult.error &&
+        !ordersUnavailable
+      ) {
+        throw ordersResult.error;
       }
+
+      if (
+        itemsResult.error &&
+        !orderItemsUnavailable
+      ) {
+        throw itemsResult.error;
+      }
+
+      setOrders(
+        ordersUnavailable
+          ? []
+          : ordersResult.data || []
+      );
+
+      setOrderItems(
+        orderItemsUnavailable
+          ? []
+          : itemsResult.data || []
+      );
+
+      setProducts(
+        productsResult.data || []
+      );
+
+      /*
+       * Analytics tables are optional during the
+       * early storefront phases.
+       *
+       * If they cannot be read, the dashboard remains
+       * functional and activity simply shows zero.
+       */
+      if (eventsResult.error) {
+        console.warn(
+          "Dashboard store_events load error:",
+          eventsResult.error.message
+        );
+      }
+
+      if (likesResult.error) {
+        console.warn(
+          "Dashboard product_likes load error:",
+          likesResult.error.message
+        );
+      }
+
+      setStoreEvents(
+        eventsResult.error
+          ? []
+          : eventsResult.data || []
+      );
+
+      setProductLikes(
+        likesResult.error
+          ? []
+          : likesResult.data || []
+      );
     } catch (err) {
-      console.error("Dashboard load error:", err);
+      console.error(
+        "Dashboard load error:",
+        err
+      );
 
       setError(
         err?.message ||
@@ -393,7 +498,11 @@ export default function AdminDashboard() {
   }, []);
 
   const validOrders = useMemo(
-    () => orders.filter((order) => !isExcludedOrder(order)),
+    () =>
+      orders.filter(
+        (order) =>
+          !isExcludedOrder(order)
+      ),
     [orders]
   );
 
@@ -406,38 +515,51 @@ export default function AdminDashboard() {
     () =>
       validOrders.filter(
         (order) =>
-          new Date(order.created_at) >= startDate
+          new Date(order.created_at) >=
+          startDate
       ),
     [validOrders, startDate]
   );
 
-  const previousRangeOrders = useMemo(() => {
-    const currentStart = startDate;
-    const now = new Date();
+  const previousRangeOrders =
+    useMemo(() => {
+      const currentStart = startDate;
+      const now = new Date();
 
-    const rangeLength =
-      now.getTime() - currentStart.getTime();
+      const rangeLength =
+        now.getTime() -
+        currentStart.getTime();
 
-    const previousEnd = new Date(currentStart);
+      const previousEnd =
+        new Date(currentStart);
 
-    const previousStart = new Date(
-      currentStart.getTime() - rangeLength
-    );
-
-    return validOrders.filter((order) => {
-      const date = new Date(order.created_at);
-
-      return (
-        date >= previousStart &&
-        date < previousEnd
+      const previousStart = new Date(
+        currentStart.getTime() -
+          rangeLength
       );
-    });
-  }, [validOrders, startDate]);
+
+      return validOrders.filter(
+        (order) => {
+          const date = new Date(
+            order.created_at
+          );
+
+          return (
+            date >= previousStart &&
+            date < previousEnd
+          );
+        }
+      );
+    }, [
+      validOrders,
+      startDate,
+    ]);
 
   const revenue = useMemo(
     () =>
       rangeOrders.reduce(
-        (sum, order) => sum + getOrderTotal(order),
+        (sum, order) =>
+          sum + getOrderTotal(order),
         0
       ),
     [rangeOrders]
@@ -446,7 +568,8 @@ export default function AdminDashboard() {
   const previousRevenue = useMemo(
     () =>
       previousRangeOrders.reduce(
-        (sum, order) => sum + getOrderTotal(order),
+        (sum, order) =>
+          sum + getOrderTotal(order),
         0
       ),
     [previousRangeOrders]
@@ -462,11 +585,19 @@ export default function AdminDashboard() {
         previousRevenue) *
         100
     );
-  }, [revenue, previousRevenue]);
+  }, [
+    revenue,
+    previousRevenue,
+  ]);
 
   const orderChange = useMemo(() => {
-    if (previousRangeOrders.length === 0) {
-      return rangeOrders.length > 0 ? 100 : 0;
+    if (
+      previousRangeOrders.length ===
+      0
+    ) {
+      return rangeOrders.length > 0
+        ? 100
+        : 0;
     }
 
     return Math.round(
@@ -484,20 +615,100 @@ export default function AdminDashboard() {
     const unique = new Set();
 
     rangeOrders.forEach((order) => {
-      unique.add(getCustomerKey(order));
+      unique.add(
+        getCustomerKey(order)
+      );
     });
 
     return unique.size;
   }, [rangeOrders]);
 
+  /*
+   * STORE ACTIVITY
+   *
+   * Visitors:
+   * Unique session IDs from VISITOR events.
+   *
+   * Product Views:
+   * Number of PRODUCT_VIEW events.
+   *
+   * Cart Adds:
+   * Number of CART_ADD events.
+   *
+   * Likes:
+   * Current persistent likes from product_likes.
+   */
+  const rangeStoreEvents = useMemo(
+    () =>
+      storeEvents.filter(
+        (event) =>
+          new Date(event.created_at) >=
+          startDate
+      ),
+    [storeEvents, startDate]
+  );
+
+  const storeActivity = useMemo(() => {
+    const visitorSessions =
+      new Set();
+
+    rangeStoreEvents
+      .filter(
+        (event) =>
+          event.event_type ===
+          "VISITOR"
+      )
+      .forEach((event) => {
+        visitorSessions.add(
+          event.session_id ||
+            event.user_id ||
+            event.id
+        );
+      });
+
+    const productViews =
+      rangeStoreEvents.filter(
+        (event) =>
+          event.event_type ===
+          "PRODUCT_VIEW"
+      ).length;
+
+    const cartAdds =
+      rangeStoreEvents.filter(
+        (event) =>
+          event.event_type ===
+          "CART_ADD"
+      ).length;
+
+    const activeLikes =
+      productLikes.length;
+
+    return {
+      visitors:
+        visitorSessions.size,
+      productViews,
+      activeLikes,
+      cartAdds,
+    };
+  }, [
+    rangeStoreEvents,
+    productLikes,
+  ]);
+
   const chartData = useMemo(
-    () => buildChartData(rangeOrders, range),
+    () =>
+      buildChartData(
+        rangeOrders,
+        range
+      ),
     [rangeOrders, range]
   );
 
   const chartMax = useMemo(() => {
     const max = Math.max(
-      ...chartData.map((item) => item.revenue),
+      ...chartData.map(
+        (item) => item.revenue
+      ),
       0
     );
 
@@ -508,13 +719,17 @@ export default function AdminDashboard() {
     const productMap = new Map();
 
     const rangeOrderIds = new Set(
-      rangeOrders.map((order) => order.id)
+      rangeOrders.map(
+        (order) => order.id
+      )
     );
 
     orderItems.forEach((item) => {
       if (
         item.order_id &&
-        !rangeOrderIds.has(item.order_id)
+        !rangeOrderIds.has(
+          item.order_id
+        )
       ) {
         return;
       }
@@ -535,7 +750,8 @@ export default function AdminDashboard() {
         });
       }
 
-      const product = productMap.get(key);
+      const product =
+        productMap.get(key);
 
       const quantity =
         Number(item.quantity) || 0;
@@ -544,40 +760,54 @@ export default function AdminDashboard() {
         Number(item.unit_price) || 0;
 
       product.units += quantity;
+
       product.revenue +=
         quantity * unitPrice;
     });
 
-    return Array.from(productMap.values())
+    return Array.from(
+      productMap.values()
+    )
       .sort((a, b) => {
         if (b.units !== a.units) {
           return b.units - a.units;
         }
 
-        return b.revenue - a.revenue;
+        return (
+          b.revenue - a.revenue
+        );
       })
       .slice(0, 5);
-  }, [orderItems, rangeOrders]);
+  }, [
+    orderItems,
+    rangeOrders,
+  ]);
 
-  const lowStockProducts = useMemo(
-    () =>
-      products
-        .filter(
-          (product) =>
-            Number(product.stock) <= 5 &&
-            String(product.status || "").toUpperCase() !==
-              "ARCHIVED"
-        )
-        .sort(
-          (a, b) =>
-            Number(a.stock) - Number(b.stock)
-        )
-        .slice(0, 6),
-    [products]
-  );
+  const lowStockProducts =
+    useMemo(
+      () =>
+        products
+          .filter(
+            (product) =>
+              Number(product.stock) <=
+                5 &&
+              String(
+                product.status || ""
+              ).toUpperCase() !==
+                "ARCHIVED"
+          )
+          .sort(
+            (a, b) =>
+              Number(a.stock) -
+              Number(b.stock)
+          )
+          .slice(0, 6),
+      [products]
+    );
 
   const recentOrders = useMemo(
-    () => validOrders.slice(0, 6),
+    () =>
+      validOrders.slice(0, 6),
     [validOrders]
   );
 
@@ -590,7 +820,9 @@ export default function AdminDashboard() {
             className="dashboard-spin"
           />
 
-          <span>Loading dashboard...</span>
+          <span>
+            Loading dashboard...
+          </span>
         </div>
       </section>
     );
@@ -607,15 +839,18 @@ export default function AdminDashboard() {
           <h1>Dashboard</h1>
 
           <p>
-            A live overview of your store performance,
-            sales and inventory.
+            A live overview of your
+            store performance, sales
+            and inventory.
           </p>
         </div>
 
         <button
           type="button"
           className="dashboard-refresh"
-          onClick={() => loadDashboard(true)}
+          onClick={() =>
+            loadDashboard(true)
+          }
           disabled={refreshing}
         >
           <RefreshCw
@@ -639,7 +874,8 @@ export default function AdminDashboard() {
 
           <div>
             <strong>
-              Dashboard data could not be loaded
+              Dashboard data could not
+              be loaded
             </strong>
 
             <p>{error}</p>
@@ -649,22 +885,27 @@ export default function AdminDashboard() {
 
       <div className="dashboard-range-row">
         <div className="dashboard-range">
-          {RANGE_OPTIONS.map((option) => (
-            <button
-              key={option.key}
-              type="button"
-              className={
-                range === option.key
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setRange(option.key)
-              }
-            >
-              {option.label}
-            </button>
-          ))}
+          {RANGE_OPTIONS.map(
+            (option) => (
+              <button
+                key={option.key}
+                type="button"
+                className={
+                  range ===
+                  option.key
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setRange(
+                    option.key
+                  )
+                }
+              >
+                {option.label}
+              </button>
+            )
+          )}
         </div>
 
         <span className="dashboard-live">
@@ -676,14 +917,19 @@ export default function AdminDashboard() {
       <div className="dashboard-stats">
         <StatCard
           label="Revenue"
-          value={formatNaira(revenue)}
+          value={formatNaira(
+            revenue
+          )}
           icon={Wallet}
           detail={`${rangeOrders.length} order${
-            rangeOrders.length === 1
+            rangeOrders.length ===
+            1
               ? ""
               : "s"
           }`}
-          trend={revenueChange}
+          trend={
+            revenueChange
+          }
         />
 
         <StatCard
@@ -693,19 +939,25 @@ export default function AdminDashboard() {
           )}
           icon={ShoppingBag}
           detail="Completed store activity"
-          trend={orderChange}
+          trend={
+            orderChange
+          }
         />
 
         <StatCard
           label="Customers"
-          value={formatNumber(customers)}
+          value={formatNumber(
+            customers
+          )}
           icon={Users}
           detail="Unique buyers"
         />
 
         <StatCard
           label="Products"
-          value={formatNumber(products.length)}
+          value={formatNumber(
+            products.length
+          )}
           icon={Package}
           detail="Products in catalogue"
         />
@@ -713,33 +965,46 @@ export default function AdminDashboard() {
 
       <div className="dashboard-section-heading">
         <div>
-          <span>STORE ACTIVITY</span>
-          <h2>What&apos;s happening</h2>
+          <span>
+            STORE ACTIVITY
+          </span>
+
+          <h2>
+            What&apos;s happening
+          </h2>
         </div>
       </div>
 
       <div className="dashboard-activity-grid">
         <ActivityCard
           label="Visitors"
-          value="NOT TRACKED"
+          value={formatNumber(
+            storeActivity.visitors
+          )}
           icon={Users}
         />
 
         <ActivityCard
           label="Product Views"
-          value="NOT TRACKED"
+          value={formatNumber(
+            storeActivity.productViews
+          )}
           icon={Eye}
         />
 
         <ActivityCard
           label="Likes"
-          value="NOT TRACKED"
+          value={formatNumber(
+            storeActivity.activeLikes
+          )}
           icon={Heart}
         />
 
         <ActivityCard
           label="Cart Adds"
-          value="NOT TRACKED"
+          value={formatNumber(
+            storeActivity.cartAdds
+          )}
           icon={ShoppingCart}
         />
 
@@ -756,7 +1021,10 @@ export default function AdminDashboard() {
         <section className="dashboard-panel dashboard-chart-panel">
           <div className="dashboard-panel-heading">
             <div>
-              <span>SALES PERFORMANCE</span>
+              <span>
+                SALES PERFORMANCE
+              </span>
+
               <h3>Revenue</h3>
             </div>
 
@@ -769,11 +1037,15 @@ export default function AdminDashboard() {
           <div className="dashboard-chart">
             <div className="dashboard-chart-y">
               <span>
-                {formatNaira(chartMax)}
+                {formatNaira(
+                  chartMax
+                )}
               </span>
 
               <span>
-                {formatNaira(chartMax / 2)}
+                {formatNaira(
+                  chartMax / 2
+                )}
               </span>
 
               <span>₦0</span>
@@ -788,9 +1060,13 @@ export default function AdminDashboard() {
 
               <div className="dashboard-bars">
                 {chartData.map(
-                  (item, index) => {
+                  (
+                    item,
+                    index
+                  ) => {
                     const height =
-                      item.revenue > 0
+                      item.revenue >
+                      0
                         ? Math.max(
                             (item.revenue /
                               chartMax) *
@@ -833,8 +1109,13 @@ export default function AdminDashboard() {
         <section className="dashboard-panel dashboard-top-products">
           <div className="dashboard-panel-heading">
             <div>
-              <span>PERFORMANCE</span>
-              <h3>Top Products</h3>
+              <span>
+                PERFORMANCE
+              </span>
+
+              <h3>
+                Top Products
+              </h3>
             </div>
 
             <Package
@@ -843,21 +1124,32 @@ export default function AdminDashboard() {
             />
           </div>
 
-          {topProducts.length === 0 ? (
+          {topProducts.length ===
+          0 ? (
             <div className="dashboard-empty">
               <Package size={22} />
-              <p>No sales data yet.</p>
+
+              <p>
+                No sales data yet.
+              </p>
             </div>
           ) : (
             <div className="dashboard-product-list">
               {topProducts.map(
-                (product, index) => (
+                (
+                  product,
+                  index
+                ) => (
                   <div
                     className="dashboard-product-row"
-                    key={product.id}
+                    key={
+                      product.id
+                    }
                   >
                     <span className="dashboard-product-rank">
-                      {String(index + 1).padStart(
+                      {String(
+                        index + 1
+                      ).padStart(
                         2,
                         "0"
                       )}
@@ -865,12 +1157,17 @@ export default function AdminDashboard() {
 
                     <div className="dashboard-product-info">
                       <strong>
-                        {product.name}
+                        {
+                          product.name
+                        }
                       </strong>
 
                       <small>
-                        {product.units}{" "}
-                        {product.units === 1
+                        {
+                          product.units
+                        }{" "}
+                        {product.units ===
+                        1
                           ? "UNIT"
                           : "UNITS"}{" "}
                         SOLD
@@ -894,8 +1191,13 @@ export default function AdminDashboard() {
         <section className="dashboard-panel">
           <div className="dashboard-panel-heading">
             <div>
-              <span>INVENTORY</span>
-              <h3>Low Stock</h3>
+              <span>
+                INVENTORY
+              </span>
+
+              <h3>
+                Low Stock
+              </h3>
             </div>
 
             <AlertTriangle
@@ -904,12 +1206,14 @@ export default function AdminDashboard() {
             />
           </div>
 
-          {lowStockProducts.length === 0 ? (
+          {lowStockProducts.length ===
+          0 ? (
             <div className="dashboard-empty">
               <Package size={22} />
 
               <p>
-                No low-stock products.
+                No low-stock
+                products.
               </p>
             </div>
           ) : (
@@ -918,15 +1222,21 @@ export default function AdminDashboard() {
                 (product) => (
                   <div
                     className="dashboard-stock-row"
-                    key={product.id}
+                    key={
+                      product.id
+                    }
                   >
                     <div>
                       <strong>
-                        {product.name}
+                        {
+                          product.name
+                        }
                       </strong>
 
                       <small>
-                        {product.categories?.name ||
+                        {product
+                          .categories
+                          ?.name ||
                           product.category ||
                           "Uncategorised"}
                       </small>
@@ -934,14 +1244,16 @@ export default function AdminDashboard() {
 
                     <span
                       className={
-                        Number(product.stock) ===
-                        0
+                        Number(
+                          product.stock
+                        ) === 0
                           ? "out"
                           : "low"
                       }
                     >
-                      {Number(product.stock) ===
-                      0
+                      {Number(
+                        product.stock
+                      ) === 0
                         ? "OUT OF STOCK"
                         : `${product.stock} LEFT`}
                     </span>
@@ -955,8 +1267,13 @@ export default function AdminDashboard() {
         <section className="dashboard-panel">
           <div className="dashboard-panel-heading">
             <div>
-              <span>STORE ACTIVITY</span>
-              <h3>Recent Orders</h3>
+              <span>
+                STORE ACTIVITY
+              </span>
+
+              <h3>
+                Recent Orders
+              </h3>
             </div>
 
             <Clock3
@@ -965,65 +1282,74 @@ export default function AdminDashboard() {
             />
           </div>
 
-          {recentOrders.length === 0 ? (
+          {recentOrders.length ===
+          0 ? (
             <div className="dashboard-empty">
               <ShoppingBag size={22} />
 
               <p>
-                No orders have been placed yet.
+                No orders have
+                been placed yet.
               </p>
             </div>
           ) : (
             <div className="dashboard-orders-list">
-              {recentOrders.map((order) => (
-                <div
-                  className="dashboard-order-row"
-                  key={order.id}
-                >
-                  <div>
-                    <strong>
-                      {order.customer_name ||
-                        order.email ||
-                        "Guest Customer"}
-                    </strong>
+              {recentOrders.map(
+                (order) => (
+                  <div
+                    className="dashboard-order-row"
+                    key={
+                      order.id
+                    }
+                  >
+                    <div>
+                      <strong>
+                        {order.customer_name ||
+                          order.email ||
+                          "Guest Customer"}
+                      </strong>
 
-                    <small>
-                      {formatDate(
-                        order.created_at
-                      )}
-                    </small>
+                      <small>
+                        {formatDate(
+                          order.created_at
+                        )}
+                      </small>
+                    </div>
+
+                    <div className="dashboard-order-right">
+                      <strong>
+                        {formatNaira(
+                          order.total
+                        )}
+                      </strong>
+
+                      <span
+                        className={`dashboard-order-status ${String(
+                          order.status ||
+                            "PENDING"
+                        ).toLowerCase()}`}
+                      >
+                        {order.status ||
+                          "PENDING"}
+                      </span>
+                    </div>
                   </div>
-
-                  <div className="dashboard-order-right">
-                    <strong>
-                      {formatNaira(
-                        order.total
-                      )}
-                    </strong>
-
-                    <span
-                      className={`dashboard-order-status ${String(
-                        order.status ||
-                          "PENDING"
-                      ).toLowerCase()}`}
-                    >
-                      {order.status ||
-                        "PENDING"}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           )}
         </section>
       </div>
 
       <div className="dashboard-footer-note">
-        <span>PENCILBOY ADMIN</span>
+        <span>
+          PENCILBOY ADMIN
+        </span>
 
         <span>
-          Data shown above comes directly from
-          your Supabase store.
+          Data shown above comes
+          directly from your
+          Supabase store.
         </span>
       </div>
     </section>
