@@ -18,6 +18,10 @@ import Policy from "./pages/Policy";
 import Admin from "./pages/Admin";
 import { supabase } from "./lib/supabase";
 import {
+  trackVisitor,
+  trackCartAdd,
+} from "./lib/storeTracking";
+import {
   FALLBACK_PRODUCTS,
   FALLBACK_DROPS,
   FALLBACK_STORIES,
@@ -28,11 +32,23 @@ const FALLBACK_CATEGORIES = [
   { id: "new-in", name: "NEW IN", slug: "new-in" },
   { id: "tees", name: "TEES", slug: "tees" },
   { id: "shorts", name: "SHORTS", slug: "shorts" },
-  { id: "hoodies", name: "HOODIES & SWEATERS", slug: "hoodies" },
+  {
+    id: "hoodies",
+    name: "HOODIES & SWEATERS",
+    slug: "hoodies",
+  },
   { id: "pants", name: "PANTS", slug: "pants" },
   { id: "jackets", name: "JACKETS", slug: "jackets" },
-  { id: "knitwear", name: "KNITWEAR", slug: "knitwear" },
-  { id: "accessories", name: "ACCESSORIES", slug: "accessories" },
+  {
+    id: "knitwear",
+    name: "KNITWEAR",
+    slug: "knitwear",
+  },
+  {
+    id: "accessories",
+    name: "ACCESSORIES",
+    slug: "accessories",
+  },
 ];
 
 const slugify = (value) =>
@@ -52,7 +68,9 @@ function readStorage(key, fallback = []) {
 }
 
 function useHashRoute() {
-  const getRoute = () => window.location.hash.replace(/^#/, "") || "/";
+  const getRoute = () =>
+    window.location.hash.replace(/^#/, "") || "/";
+
   const [route, setRoute] = useState(getRoute);
 
   useEffect(() => {
@@ -60,17 +78,29 @@ function useHashRoute() {
 
     window.addEventListener("hashchange", update);
 
-    return () => window.removeEventListener("hashchange", update);
+    return () =>
+      window.removeEventListener(
+        "hashchange",
+        update
+      );
   }, []);
 
   const navigate = (path) => {
     if (window.location.hash === `#${path}`) {
-      window.scrollTo({ top: 0, behavior: "auto" });
+      window.scrollTo({
+        top: 0,
+        behavior: "auto",
+      });
+
       return;
     }
 
     window.location.hash = path;
-    window.scrollTo({ top: 0, behavior: "auto" });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "auto",
+    });
   };
 
   return [route, navigate];
@@ -78,52 +108,123 @@ function useHashRoute() {
 
 export default function App() {
   const [route, navigate] = useHashRoute();
+
   const baseRoute = route.split("?")[0];
 
-  const [products, setProducts] = useState(FALLBACK_PRODUCTS);
-  const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
-  const [drops, setDrops] = useState(FALLBACK_DROPS);
-  const [stories, setStories] = useState(FALLBACK_STORIES);
-  const [lookbook, setLookbook] = useState(FALLBACK_LOOKBOOK);
+  const [products, setProducts] = useState(
+    FALLBACK_PRODUCTS
+  );
 
-  const [cart, setCart] = useState(() => readStorage("pencilboy_cart", []));
-  const [saved, setSaved] = useState(() => readStorage("pencilboy_saved", []));
+  const [categories, setCategories] = useState(
+    FALLBACK_CATEGORIES
+  );
+
+  const [drops, setDrops] = useState(
+    FALLBACK_DROPS
+  );
+
+  const [stories, setStories] = useState(
+    FALLBACK_STORIES
+  );
+
+  const [lookbook, setLookbook] = useState(
+    FALLBACK_LOOKBOOK
+  );
+
+  const [cart, setCart] = useState(() =>
+    readStorage("pencilboy_cart", [])
+  );
+
+  const [saved, setSaved] = useState(() =>
+    readStorage("pencilboy_saved", [])
+  );
+
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    localStorage.setItem("pencilboy_cart", JSON.stringify(cart));
-  }, [cart]);
+  /*
+   * -------------------------------------------------------
+   * VISITOR TRACKING
+   * -------------------------------------------------------
+   *
+   * A visitor is recorded when they enter the storefront.
+   *
+   * We intentionally do not track the Admin page as a
+   * storefront visitor.
+   */
 
   useEffect(() => {
-    localStorage.setItem("pencilboy_saved", JSON.stringify(saved));
+    if (baseRoute === "/admin") {
+      return;
+    }
+
+    trackVisitor();
+  }, []);
+
+  /*
+   * -------------------------------------------------------
+   * LOCAL CART STORAGE
+   * -------------------------------------------------------
+   */
+
+  useEffect(() => {
+    localStorage.setItem(
+      "pencilboy_cart",
+      JSON.stringify(cart)
+    );
+  }, [cart]);
+
+  /*
+   * -------------------------------------------------------
+   * LOCAL SAVED STATE
+   * -------------------------------------------------------
+   *
+   * This remains temporarily while we build the persistent
+   * Supabase Likes system in the next step.
+   */
+
+  useEffect(() => {
+    localStorage.setItem(
+      "pencilboy_saved",
+      JSON.stringify(saved)
+    );
   }, [saved]);
+
+  /*
+   * -------------------------------------------------------
+   * LOAD STORE
+   * -------------------------------------------------------
+   */
 
   useEffect(() => {
     let subscription;
 
     async function loadStore() {
       try {
-        const authResult = await supabase.auth.getUser();
+        const authResult =
+          await supabase.auth.getUser();
 
         if (!authResult.error) {
-          setUser(authResult.data?.user || null);
+          setUser(
+            authResult.data?.user || null
+          );
         }
 
-        // Phase 1 only: products and categories are connected to Supabase.
-        // Drops, World/Stories and Lookbook remain on their local fallback data
-        // until those tables are intentionally added in a later phase.
         const [p, c] = await Promise.all([
           supabase
             .from("products")
             .select("*")
             .eq("status", "PUBLISHED")
-            .order("sort_order", { ascending: true }),
+            .order("sort_order", {
+              ascending: true,
+            }),
 
           supabase
             .from("categories")
             .select("*")
             .eq("status", "PUBLISHED")
-            .order("sort_order", { ascending: true }),
+            .order("sort_order", {
+              ascending: true,
+            }),
         ]);
 
         if (p.data?.length) {
@@ -135,20 +236,30 @@ export default function App() {
         }
 
         if (p.error) {
-          console.warn("PENCILBOY products query:", p.error.message);
+          console.warn(
+            "PENCILBOY products query:",
+            p.error.message
+          );
         }
 
         if (c.error) {
-          console.warn("PENCILBOY categories query:", c.error.message);
+          console.warn(
+            "PENCILBOY categories query:",
+            c.error.message
+          );
         }
 
-        const authListener = supabase.auth.onAuthStateChange(
-          (_event, session) => {
-            setUser(session?.user || null);
-          }
-        );
+        const authListener =
+          supabase.auth.onAuthStateChange(
+            (_event, session) => {
+              setUser(
+                session?.user || null
+              );
+            }
+          );
 
-        subscription = authListener.data.subscription;
+        subscription =
+          authListener.data.subscription;
       } catch (error) {
         console.warn(
           "PENCILBOY: Supabase unavailable. Using fallback data.",
@@ -159,52 +270,123 @@ export default function App() {
 
     loadStore();
 
-    return () => subscription?.unsubscribe();
+    return () =>
+      subscription?.unsubscribe();
   }, []);
 
+  /*
+   * -------------------------------------------------------
+   * OPEN PRODUCT
+   * -------------------------------------------------------
+   */
+
   const openProduct = (product) =>
-    navigate(`/product/${product.slug || slugify(product.name)}`);
+    navigate(
+      `/product/${
+        product.slug ||
+        slugify(product.name)
+      }`
+    );
+
+  /*
+   * -------------------------------------------------------
+   * SAVE / LIKE
+   * -------------------------------------------------------
+   *
+   * The actual persistent Supabase Likes system comes next.
+   * For now we preserve the existing working UI behavior.
+   */
 
   const onSave = (id) => {
     setSaved((current) =>
       current.includes(id)
-        ? current.filter((item) => item !== id)
+        ? current.filter(
+            (item) => item !== id
+          )
         : [...current, id]
     );
   };
 
-  const addToBag = (product, size, qty) => {
+  /*
+   * -------------------------------------------------------
+   * ADD TO CART
+   * -------------------------------------------------------
+   */
+
+  const addToBag = (
+    product,
+    size,
+    qty
+  ) => {
     setCart((current) => {
-      const existingIndex = current.findIndex(
-        (item) => item.id === product.id && item.size === size
-      );
+      const existingIndex =
+        current.findIndex(
+          (item) =>
+            item.id === product.id &&
+            item.size === size
+        );
 
       if (existingIndex >= 0) {
-        return current.map((item, index) =>
-          index === existingIndex
-            ? { ...item, qty: item.qty + qty }
-            : item
+        return current.map(
+          (item, index) =>
+            index === existingIndex
+              ? {
+                  ...item,
+                  qty:
+                    item.qty +
+                    qty,
+                }
+              : item
         );
       }
 
-      return [...current, { ...product, size, qty }];
+      return [
+        ...current,
+        {
+          ...product,
+          size,
+          qty,
+        },
+      ];
     });
+
+    /*
+     * Record the cart addition in Supabase.
+     *
+     * Tracking is intentionally non-blocking.
+     * If tracking fails, the customer's cart still works.
+     */
+    trackCartAdd(
+      product?.id,
+      qty
+    );
 
     navigate("/bag");
   };
 
-  const selectedProduct = route.startsWith("/product/")
-    ? products.find(
-        (product) =>
-          (product.slug || slugify(product.name)) === route.split("/")[2]
-      )
-    : null;
+  /*
+   * -------------------------------------------------------
+   * SELECTED PRODUCT
+   * -------------------------------------------------------
+   */
+
+  const selectedProduct =
+    route.startsWith("/product/")
+      ? products.find(
+          (product) =>
+            (product.slug ||
+              slugify(product.name)) ===
+            route.split("/")[2]
+        )
+      : null;
 
   let page;
 
   switch (baseRoute) {
     case "/":
-      page = <Home navigate={navigate} />;
+      page = (
+        <Home navigate={navigate} />
+      );
       break;
 
     case "/shop":
@@ -232,11 +414,19 @@ export default function App() {
       break;
 
     case "/lookbook":
-      page = <Lookbook entries={lookbook} />;
+      page = (
+        <Lookbook
+          entries={lookbook}
+        />
+      );
       break;
 
     case "/world":
-      page = <World stories={stories} />;
+      page = (
+        <World
+          stories={stories}
+        />
+      );
       break;
 
     case "/about":
@@ -259,7 +449,13 @@ export default function App() {
       break;
 
     case "/bag":
-      page = <Bag cart={cart} setCart={setCart} navigate={navigate} />;
+      page = (
+        <Bag
+          cart={cart}
+          setCart={setCart}
+          navigate={navigate}
+        />
+      );
       break;
 
     case "/checkout":
@@ -268,7 +464,9 @@ export default function App() {
           cart={cart}
           user={user}
           navigate={navigate}
-          clearCart={() => setCart([])}
+          clearCart={() =>
+            setCart([])
+          }
         />
       );
       break;
@@ -287,50 +485,78 @@ export default function App() {
       break;
 
     case "/signin":
-      page = <SignIn navigate={navigate} />;
+      page = (
+        <SignIn
+          navigate={navigate}
+        />
+      );
       break;
 
     case "/admin":
-      page = <Admin user={user} navigate={navigate} />;
+      page = (
+        <Admin
+          user={user}
+          navigate={navigate}
+        />
+      );
       break;
 
     case "/terms":
     case "/privacy":
     case "/returns":
-      page = <Policy type={baseRoute.slice(1)} />;
+      page = (
+        <Policy
+          type={baseRoute.slice(1)}
+        />
+      );
       break;
 
     default:
       page = selectedProduct ? (
         <Product
           product={selectedProduct}
-          onBack={() => navigate("/shop")}
+          onBack={() =>
+            navigate("/shop")
+          }
           addToBag={addToBag}
         />
       ) : (
-        <Home navigate={navigate} />
+        <Home
+          navigate={navigate}
+        />
       );
   }
 
-  const isLandingPage = baseRoute === "/";
-  const isAdminPage = baseRoute === "/admin";
+  const isLandingPage =
+    baseRoute === "/";
+
+  const isAdminPage =
+    baseRoute === "/admin";
 
   return (
     <>
-      {!isLandingPage && !isAdminPage && (
-        <Header
-          cartCount={cart.reduce(
-            (sum, item) => sum + Number(item.qty || 0),
-            0
-          )}
-          navigate={navigate}
-          categories={categories}
-        />
-      )}
+      {!isLandingPage &&
+        !isAdminPage && (
+          <Header
+            cartCount={cart.reduce(
+              (sum, item) =>
+                sum +
+                Number(
+                  item.qty || 0
+                ),
+              0
+            )}
+            navigate={navigate}
+            categories={categories}
+          />
+        )}
 
       {page}
 
-      {!isLandingPage && !isAdminPage && <Footer />}
+      {!isLandingPage &&
+        !isAdminPage && (
+          <Footer />
+        )}
     </>
   );
 }

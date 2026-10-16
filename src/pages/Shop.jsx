@@ -9,21 +9,27 @@ export default function Shop({
   saved,
   loading = false,
 }) {
-  const [category, setCategory] = useState("");
+  const [category, setCategory] =
+    useState("");
 
   useEffect(() => {
     const readCategory = () => {
-      const hash = window.location.hash.replace(
-        /^#/,
-        ""
-      );
+      const hash =
+        window.location.hash.replace(
+          /^#/,
+          ""
+        );
 
-      const params = new URLSearchParams(
-        hash.split("?")[1] || ""
-      );
+      const params =
+        new URLSearchParams(
+          hash.split("?")[1] || ""
+        );
 
       setCategory(
-        (params.get("category") || "").toLowerCase()
+        (
+          params.get("category") ||
+          ""
+        ).toLowerCase()
       );
     };
 
@@ -43,28 +49,93 @@ export default function Shop({
   }, []);
 
   const visible = useMemo(() => {
-    if (!category) return products;
+    /*
+     * /shop without ?category=
+     * is NEW IN.
+     */
+    if (!category) {
+      return products.filter(
+        (product) =>
+          product.new_in === true
+      );
+    }
 
-    return products.filter((product) => {
-      const productCategory = String(
-        product.category_slug || ""
-      ).toLowerCase();
-
-      if (productCategory) {
-        return productCategory === category;
-      }
-
-      const categoryRecord = categories.find(
+    const categoryRecord =
+      categories.find(
         (item) =>
-          item.name?.toLowerCase() ===
-          String(product.category || "").toLowerCase()
+          String(
+            item.slug || ""
+          ).toLowerCase() ===
+          category
       );
 
-      return (
-        categoryRecord?.slug?.toLowerCase() ===
-        category
-      );
-    });
+    return products.filter(
+      (product) => {
+        /*
+         * Main method:
+         * product.category_id
+         * matches category.id.
+         */
+        if (
+          categoryRecord &&
+          product.category_id
+        ) {
+          return (
+            String(
+              product.category_id
+            ) ===
+            String(
+              categoryRecord.id
+            )
+          );
+        }
+
+        /*
+         * Fallback if a product already
+         * contains category_slug.
+         */
+        const productCategorySlug =
+          String(
+            product.category_slug ||
+              ""
+          ).toLowerCase();
+
+        if (
+          productCategorySlug
+        ) {
+          return (
+            productCategorySlug ===
+            category
+          );
+        }
+
+        /*
+         * Older fallback using category name.
+         */
+        const productCategoryName =
+          String(
+            product.category || ""
+          ).toLowerCase();
+
+        if (
+          productCategoryName
+        ) {
+          return categories.some(
+            (item) =>
+              String(
+                item.slug || ""
+              ).toLowerCase() ===
+                category &&
+              String(
+                item.name || ""
+              ).toLowerCase() ===
+                productCategoryName
+          );
+        }
+
+        return false;
+      }
+    );
   }, [
     products,
     categories,
