@@ -2635,3 +2635,37 @@ a {
     transition: none;
   }
 }
+/* =========================================================
+   PENCILBOY — MOBILE/TABLET LOGO POSITION FIX
+   Keep desktop unchanged.
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .store-header > .brand-logo {
+    top: 0;
+    width: 76px;
+    height: 50px;
+  }
+
+  .store-header > .brand-logo img {
+    width: 64px;
+    height: 50px;
+    max-height: 50px;
+    object-fit: contain;
+  }
+}
+
+@media (max-width: 520px) {
+  .store-header > .brand-logo {
+    top: 0;
+    width: 70px;
+    height: 46px;
+  }
+
+  .store-header > .brand-logo img {
+    width: 58px;
+    height: 46px;
+    max-height: 46px;
+    object-fit: contain;
+  }
+}

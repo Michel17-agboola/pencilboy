@@ -33,12 +33,18 @@ export default function Header({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const currentRoute = window.location.hash.replace(/^#/, "") || "/";
+  const currentRoute =
+    window.location.hash.replace(/^#/, "") || "/";
   const currentPath = currentRoute.split("?")[0];
 
   const activeCategory = useMemo(() => {
-    const query = new URLSearchParams(currentRoute.split("?")[1] || "");
-    return (query.get("category") || "").toLowerCase();
+    const query = new URLSearchParams(
+      currentRoute.split("?")[1] || ""
+    );
+
+    return (
+      query.get("category") || ""
+    ).toLowerCase();
   }, [currentRoute]);
 
   const displayCategories = useMemo(() => {
@@ -54,8 +60,13 @@ export default function Header({
     source.forEach((category) => {
       if (!category) return;
 
-      const name = String(category.name || "").trim();
-      const slug = String(category.slug || "").trim();
+      const name = String(
+        category.name || ""
+      ).trim();
+
+      const slug = String(
+        category.slug || ""
+      ).trim();
 
       const normalized = name
         .toLowerCase()
@@ -70,16 +81,21 @@ export default function Header({
 
       const key = isNewIn
         ? "new-in"
-        : slug.toLowerCase() || normalized || String(category.id);
+        : slug.toLowerCase() ||
+          normalized ||
+          String(category.id);
 
       if (seen.has(key)) return;
+
       seen.add(key);
 
       result.push({
         ...category,
         id: category.id || key,
         name: isNewIn ? "NEW IN" : name,
-        slug: isNewIn ? "new-in" : slug || normalized,
+        slug: isNewIn
+          ? "new-in"
+          : slug || normalized,
       });
     });
 
@@ -97,16 +113,25 @@ export default function Header({
   };
 
   const handleCategory = (category) => {
-    if (!category?.slug || category.slug === "new-in") {
+    if (
+      !category?.slug ||
+      category.slug === "new-in"
+    ) {
       goTo("/shop");
       return;
     }
 
-    goTo(`/shop?category=${encodeURIComponent(category.slug)}`);
+    goTo(
+      `/shop?category=${encodeURIComponent(
+        category.slug
+      )}`
+    );
   };
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    document.body.style.overflow = menuOpen
+      ? "hidden"
+      : "";
 
     return () => {
       document.body.style.overflow = "";
@@ -118,15 +143,29 @@ export default function Header({
       <header className="store-header">
         <button
           type="button"
-          className={`store-menu ${menuOpen ? "is-open" : ""}`}
-          onClick={() => setMenuOpen((value) => !value)}
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          className={`store-menu ${
+            menuOpen ? "is-open" : ""
+          }`}
+          onClick={() =>
+            setMenuOpen((value) => !value)
+          }
+          aria-label={
+            menuOpen
+              ? "Close menu"
+              : "Open menu"
+          }
           aria-expanded={menuOpen}
         >
           {menuOpen ? (
-            <X size={21} strokeWidth={1.5} />
+            <X
+              size={21}
+              strokeWidth={1.5}
+            />
           ) : (
-            <Plus size={21} strokeWidth={1.5} />
+            <Plus
+              size={21}
+              strokeWidth={1.5}
+            />
           )}
         </button>
 
@@ -135,40 +174,74 @@ export default function Header({
         <button
           type="button"
           className="store-bag"
-          onClick={() => goTo("/bag")}
-          aria-label="Shopping bag"
+          onClick={() => goTo("/cart")}
+          aria-label="Cart"
         >
-          <ShoppingBag size={21} strokeWidth={1.5} />
+          <ShoppingBag
+            size={21}
+            strokeWidth={1.5}
+          />
+
           {cartCount > 0 && (
-            <span>{cartCount > 99 ? "99+" : cartCount}</span>
+            <span>
+              {cartCount > 99
+                ? "99+"
+                : cartCount}
+            </span>
           )}
         </button>
 
-        <nav className="category-nav" aria-label="Shop categories">
+        <nav
+          className="category-nav"
+          aria-label="Shop categories"
+        >
           {loading ? (
-            <div className="category-nav-skeleton" aria-hidden="true">
-              {Array.from({ length: 7 }).map((_, index) => (
+            <div
+              className="category-nav-skeleton"
+              aria-hidden="true"
+            >
+              {Array.from({
+                length: 7,
+              }).map((_, index) => (
                 <span key={index} />
               ))}
             </div>
           ) : (
-            displayCategories.map((category) => {
-              const isNewIn = category.slug === "new-in";
-              const isActive = isNewIn
-                ? currentPath === "/shop" && !activeCategory
-                : activeCategory === String(category.slug).toLowerCase();
+            displayCategories.map(
+              (category) => {
+                const isNewIn =
+                  category.slug ===
+                  "new-in";
 
-              return (
-                <button
-                  type="button"
-                  key={category.id}
-                  className={isActive ? "active" : ""}
-                  onClick={() => handleCategory(category)}
-                >
-                  {category.name}
-                </button>
-              );
-            })
+                const isActive = isNewIn
+                  ? currentPath ===
+                      "/shop" &&
+                    !activeCategory
+                  : activeCategory ===
+                    String(
+                      category.slug
+                    ).toLowerCase();
+
+                return (
+                  <button
+                    type="button"
+                    key={category.id}
+                    className={
+                      isActive
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() =>
+                      handleCategory(
+                        category
+                      )
+                    }
+                  >
+                    {category.name}
+                  </button>
+                );
+              }
+            )
           )}
         </nav>
       </header>
@@ -177,56 +250,92 @@ export default function Header({
         <div className="store-menu-overlay">
           <div className="store-menu-top">
             <button
-  type="button"
-  className="store-menu-logo"
-  onClick={() => goTo("/")}
-  aria-label="PNCHE Studios home"
->
-  <img src="/pnche.png" alt="PNCHE Studios" />
-</button>
+              type="button"
+              className="store-menu-logo"
+              onClick={() =>
+                goTo("/")
+              }
+              aria-label="PNCHE Studios home"
+            >
+              <img
+                src="/pnche.png"
+                alt="PNCHE Studios"
+              />
+            </button>
 
             <button
               type="button"
               className="store-menu-close"
-              onClick={() => setMenuOpen(false)}
+              onClick={() =>
+                setMenuOpen(false)
+              }
             >
               <span>CLOSE</span>
-              <X size={22} strokeWidth={1.5} />
+              <X
+                size={22}
+                strokeWidth={1.5}
+              />
             </button>
           </div>
 
           <div className="store-menu-content">
             <section className="store-menu-main">
-              <span className="store-menu-label">MENU</span>
+              <span className="store-menu-label">
+                MENU
+              </span>
 
               <div className="store-menu-links">
-                {MENU_ITEMS.map(([label, path]) => (
-                  <button
-                    type="button"
-                    key={label}
-                    onClick={() => goTo(path)}
-                  >
-                    <span>{label}</span>
-                    <ArrowUpRight size={28} strokeWidth={1.3} />
-                  </button>
-                ))}
+                {MENU_ITEMS.map(
+                  ([label, path]) => (
+                    <button
+                      type="button"
+                      key={label}
+                      onClick={() =>
+                        goTo(path)
+                      }
+                    >
+                      <span>
+                        {label}
+                      </span>
+
+                      <ArrowUpRight
+                        size={28}
+                        strokeWidth={1.3}
+                      />
+                    </button>
+                  )
+                )}
               </div>
             </section>
 
             <aside className="store-menu-categories">
-              <span className="store-menu-label">SHOP BY CATEGORY</span>
+              <span className="store-menu-label">
+                SHOP BY CATEGORY
+              </span>
 
               <div className="store-menu-category-list">
-                {displayCategories.map((category) => (
-                  <button
-                    type="button"
-                    key={category.id}
-                    onClick={() => handleCategory(category)}
-                  >
-                    <span>{category.name}</span>
-                    <ArrowUpRight size={18} strokeWidth={1.4} />
-                  </button>
-                ))}
+                {displayCategories.map(
+                  (category) => (
+                    <button
+                      type="button"
+                      key={category.id}
+                      onClick={() =>
+                        handleCategory(
+                          category
+                        )
+                      }
+                    >
+                      <span>
+                        {category.name}
+                      </span>
+
+                      <ArrowUpRight
+                        size={18}
+                        strokeWidth={1.4}
+                      />
+                    </button>
+                  )
+                )}
               </div>
             </aside>
           </div>

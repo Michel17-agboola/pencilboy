@@ -1,19 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Plus,
-  Search,
-  Package,
-  Tags,
-  LogOut,
-  Pencil,
-  Trash2,
-  X,
-  Save,
-  ArrowLeft,
-  RefreshCw,
-} from "lucide-react";
-
+import { Plus, Search, Package, Tags, LogOut, Pencil, Trash2, X, Save, ArrowLeft, RefreshCw, Activity } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import AdminDashboard from "./AdminDashboard";
 import "../admin.css";
 
 const EMPTY_PRODUCT = {
@@ -30,7 +18,7 @@ const EMPTY_PRODUCT = {
   featured: false,
   new_in: false,
   status: "DRAFT",
-  sort_order: 0,
+  sort_order: 0
 };
 
 const EMPTY_CATEGORY = {
@@ -39,10 +27,10 @@ const EMPTY_CATEGORY = {
   description: "",
   image_url: "",
   sort_order: 0,
-  status: "PUBLISHED",
+  status: "PUBLISHED"
 };
 
-const slugify = (value) =>
+const slugify = value =>
   String(value || "")
     .toLowerCase()
     .trim()
@@ -52,61 +40,50 @@ const slugify = (value) =>
 function splitValues(value) {
   return String(value || "")
     .split(",")
-    .map((item) => item.trim())
+    .map(item => item.trim())
     .filter(Boolean);
 }
 
 function formatNaira(value) {
-  return `₦${Number(value || 0).toLocaleString(
-    "en-NG"
-  )}`;
+  return `₦${Number(value || 0).toLocaleString("en-NG")}`;
 }
 
 function AdminLogin({ onLoggedIn }) {
   const [email, setEmail] = useState("");
-  const [password, setPassword] =
-    useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] =
-    useState(false);
-
-  const [error, setError] =
-    useState("");
-
-  const submit = async (event) => {
+  const submit = async event => {
     event.preventDefault();
-
     setLoading(true);
     setError("");
 
-    const { data, error: signInError } =
-      await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
+    const {
+      data,
+      error: signInError
+    } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password
+    });
 
     if (signInError) {
-      setError(
-        signInError.message
-      );
+      setError(signInError.message);
       setLoading(false);
       return;
     }
 
-    const { data: admin } =
-      await supabase
-        .from("admin_users")
-        .select("user_id, role")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+    const {
+      data: admin
+    } = await supabase
+      .from("admin_users")
+      .select("user_id, role")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
 
     if (!admin) {
       await supabase.auth.signOut();
-
-      setError(
-        "This account does not have admin access."
-      );
-
+      setError("This account does not have admin access.");
       setLoading(false);
       return;
     }
@@ -139,10 +116,8 @@ function AdminLogin({ onLoggedIn }) {
             <input
               type="email"
               value={email}
-              onChange={(event) =>
-                setEmail(
-                  event.target.value
-                )
+              onChange={event =>
+                setEmail(event.target.value)
               }
               placeholder="admin@email.com"
               required
@@ -154,10 +129,8 @@ function AdminLogin({ onLoggedIn }) {
             <input
               type="password"
               value={password}
-              onChange={(event) =>
-                setPassword(
-                  event.target.value
-                )
+              onChange={event =>
+                setPassword(event.target.value)
               }
               placeholder="••••••••"
               required
@@ -189,7 +162,7 @@ function ProductForm({
   product,
   categories,
   onSave,
-  onCancel,
+  onCancel
 }) {
   const [form, setForm] =
     useState(product || EMPTY_PRODUCT);
@@ -210,22 +183,24 @@ function ProductForm({
     useState("");
 
   useEffect(() => {
-    setForm(
-      product || EMPTY_PRODUCT
-    );
+    setForm(product || EMPTY_PRODUCT);
     setError("");
     setSizeInput("");
     setColorInput("");
   }, [product]);
 
   const update = (key, value) => {
-    setForm((current) => ({
+    setForm(current => ({
       ...current,
-      [key]: value,
+      [key]: value
     }));
   };
 
-  const addListValue = (key, value, clear) => {
+  const addListValue = (
+    key,
+    value,
+    clear
+  ) => {
     const cleanValue =
       String(value || "").trim();
 
@@ -235,7 +210,7 @@ function ProductForm({
       splitValues(form[key]);
 
     const exists = currentValues.some(
-      (item) =>
+      item =>
         item.toLowerCase() ===
         cleanValue.toLowerCase()
     );
@@ -243,7 +218,7 @@ function ProductForm({
     if (!exists) {
       update(key, [
         ...currentValues,
-        cleanValue,
+        cleanValue
       ]);
     }
 
@@ -283,7 +258,7 @@ function ProductForm({
     }
   };
 
-  const uploadImages = async (event) => {
+  const uploadImages = async event => {
     const files = Array.from(
       event.target.files || []
     );
@@ -298,9 +273,7 @@ function ProductForm({
 
       for (const file of files) {
         if (
-          !file.type.startsWith(
-            "image/"
-          )
+          !file.type.startsWith("image/")
         ) {
           throw new Error(
             `${file.name} is not an image file.`
@@ -328,7 +301,7 @@ function ProductForm({
           `${crypto.randomUUID()}-${safeName}`;
 
         const {
-          error: uploadError,
+          error: uploadError
         } =
           await supabase.storage
             .from("product-images")
@@ -336,22 +309,20 @@ function ProductForm({
               path,
               file,
               {
-                cacheControl:
-                  "3600",
+                cacheControl: "3600",
                 upsert: false,
-                contentType:
-                  file.type,
+                contentType: file.type
               }
             );
 
         if (uploadError)
           throw uploadError;
 
-        const { data } =
+        const {
+          data
+        } =
           supabase.storage
-            .from(
-              "product-images"
-            )
+            .from("product-images")
             .getPublicUrl(path);
 
         if (data?.publicUrl) {
@@ -362,10 +333,8 @@ function ProductForm({
       }
 
       update("images", [
-        ...splitValues(
-          form.images
-        ),
-        ...uploadedUrls,
+        ...splitValues(form.images),
+        ...uploadedUrls
       ]);
     } catch (uploadError) {
       setError(
@@ -378,23 +347,19 @@ function ProductForm({
     }
   };
 
-  const removeImage = (index) => {
+  const removeImage = index => {
     update(
       "images",
-      splitValues(
-        form.images
-      ).filter(
+      splitValues(form.images).filter(
         (_, imageIndex) =>
           imageIndex !== index
       )
     );
   };
 
-  const makePrimary = (index) => {
+  const makePrimary = index => {
     const images =
-      splitValues(
-        form.images
-      );
+      splitValues(form.images);
 
     if (index <= 0) return;
 
@@ -402,11 +367,11 @@ function ProductForm({
       images[index],
       ...images.filter(
         (_, i) => i !== index
-      ),
+      )
     ]);
   };
 
-  const submit = async (event) => {
+  const submit = async event => {
     event.preventDefault();
 
     setSaving(true);
@@ -431,22 +396,17 @@ function ProductForm({
 
       compare_at_price:
         form.compare_at_price
-          ? Number(
-              form.compare_at_price
-            )
+          ? Number(form.compare_at_price)
           : null,
 
-      images: splitValues(
-        form.images
-      ),
+      images:
+        splitValues(form.images),
 
-      sizes: splitValues(
-        form.sizes
-      ),
+      sizes:
+        splitValues(form.sizes),
 
-      colors: splitValues(
-        form.colors
-      ),
+      colors:
+        splitValues(form.colors),
 
       stock:
         Number(form.stock) || 0,
@@ -457,31 +417,33 @@ function ProductForm({
       new_in:
         Boolean(form.new_in),
 
-      status: form.status,
+      status:
+        form.status,
 
       sort_order:
-        Number(form.sort_order) ||
-        0,
+        Number(form.sort_order) || 0,
 
       updated_at:
-        new Date().toISOString(),
+        new Date().toISOString()
     };
 
     let result;
 
     if (product?.id) {
-      result = await supabase
-        .from("products")
-        .update(payload)
-        .eq("id", product.id)
-        .select()
-        .single();
+      result =
+        await supabase
+          .from("products")
+          .update(payload)
+          .eq("id", product.id)
+          .select()
+          .single();
     } else {
-      result = await supabase
-        .from("products")
-        .insert(payload)
-        .select()
-        .single();
+      result =
+        await supabase
+          .from("products")
+          .insert(payload)
+          .select()
+          .single();
     }
 
     if (result.error) {
@@ -534,9 +496,10 @@ function ProductForm({
           <div className="admin-two-column">
             <label>
               PRODUCT NAME
+
               <input
                 value={form.name}
-                onChange={(event) =>
+                onChange={event =>
                   update(
                     "name",
                     event.target.value
@@ -548,9 +511,10 @@ function ProductForm({
 
             <label>
               SLUG
+
               <input
                 value={form.slug}
-                onChange={(event) =>
+                onChange={event =>
                   update(
                     "slug",
                     event.target.value
@@ -565,9 +529,10 @@ function ProductForm({
 
           <label>
             DESCRIPTION
+
             <textarea
               value={form.description}
-              onChange={(event) =>
+              onChange={event =>
                 update(
                   "description",
                   event.target.value
@@ -586,11 +551,10 @@ function ProductForm({
           <div className="admin-two-column">
             <label>
               CATEGORY
+
               <select
-                value={
-                  form.category_id
-                }
-                onChange={(event) =>
+                value={form.category_id}
+                onChange={event =>
                   update(
                     "category_id",
                     event.target.value
@@ -602,14 +566,10 @@ function ProductForm({
                 </option>
 
                 {categories.map(
-                  (category) => (
+                  category => (
                     <option
-                      key={
-                        category.id
-                      }
-                      value={
-                        category.id
-                      }
+                      key={category.id}
+                      value={category.id}
                     >
                       {category.name}
                     </option>
@@ -620,9 +580,10 @@ function ProductForm({
 
             <label>
               STATUS
+
               <select
                 value={form.status}
-                onChange={(event) =>
+                onChange={event =>
                   update(
                     "status",
                     event.target.value
@@ -655,7 +616,7 @@ function ProductForm({
                 checked={
                   form.featured
                 }
-                onChange={(event) =>
+                onChange={event =>
                   update(
                     "featured",
                     event.target.checked
@@ -672,7 +633,7 @@ function ProductForm({
                 checked={
                   form.new_in
                 }
-                onChange={(event) =>
+                onChange={event =>
                   update(
                     "new_in",
                     event.target.checked
@@ -699,7 +660,7 @@ function ProductForm({
                 min="0"
                 step="0.01"
                 value={form.price}
-                onChange={(event) =>
+                onChange={event =>
                   update(
                     "price",
                     event.target.value
@@ -719,7 +680,7 @@ function ProductForm({
                 value={
                   form.compare_at_price
                 }
-                onChange={(event) =>
+                onChange={event =>
                   update(
                     "compare_at_price",
                     event.target.value
@@ -735,7 +696,7 @@ function ProductForm({
                 type="number"
                 min="0"
                 value={form.stock}
-                onChange={(event) =>
+                onChange={event =>
                   update(
                     "stock",
                     event.target.value
@@ -750,9 +711,8 @@ function ProductForm({
               className="admin-tag-field"
               style={{
                 display: "flex",
-                flexDirection:
-                  "column",
-                gap: 10,
+                flexDirection: "column",
+                gap: 10
               }}
             >
               <label>
@@ -763,10 +723,9 @@ function ProductForm({
                 className="admin-tag-list"
                 style={{
                   display: "flex",
-                  flexWrap:
-                    "wrap",
+                  flexWrap: "wrap",
                   gap: 8,
-                  minHeight: 4,
+                  minHeight: 4
                 }}
               >
                 {splitValues(
@@ -793,7 +752,7 @@ function ProductForm({
                           "#fff",
                         fontSize: 10,
                         letterSpacing:
-                          ".04em",
+                          ".04em"
                       }}
                     >
                       {size}
@@ -819,7 +778,7 @@ function ProductForm({
                           color:
                             "#777",
                           cursor:
-                            "pointer",
+                            "pointer"
                         }}
                       >
                         <X size={12} />
@@ -835,24 +794,19 @@ function ProductForm({
                   display: "flex",
                   gap: 8,
                   alignItems:
-                    "stretch",
+                    "stretch"
                 }}
               >
                 <input
                   value={
                     sizeInput
                   }
-                  onChange={(
-                    event
-                  ) =>
+                  onChange={event =>
                     setSizeInput(
-                      event.target
-                        .value
+                      event.target.value
                     )
                   }
-                  onKeyDown={(
-                    event
-                  ) =>
+                  onKeyDown={event =>
                     handleListKeyDown(
                       event,
                       "sizes",
@@ -884,7 +838,7 @@ function ProductForm({
                   display: "flex",
                   flexWrap:
                     "wrap",
-                  gap: 6,
+                  gap: 6
                 }}
               >
                 {[
@@ -893,37 +847,35 @@ function ProductForm({
                   "M",
                   "L",
                   "XL",
-                  "XXL",
-                ].map(
-                  (size) => (
-                    <button
-                      type="button"
-                      key={size}
-                      onClick={() =>
-                        addListValue(
-                          "sizes",
-                          size,
-                          setSizeInput
-                        )
-                      }
-                      style={{
-                        border:
-                          "1px solid #deded9",
-                        background:
-                          "#f8f8f6",
-                        color:
-                          "#555",
-                        padding:
-                          "6px 9px",
-                        cursor:
-                          "pointer",
-                        fontSize: 9,
-                      }}
-                    >
-                      + {size}
-                    </button>
-                  )
-                )}
+                  "XXL"
+                ].map(size => (
+                  <button
+                    type="button"
+                    key={size}
+                    onClick={() =>
+                      addListValue(
+                        "sizes",
+                        size,
+                        setSizeInput
+                      )
+                    }
+                    style={{
+                      border:
+                        "1px solid #deded9",
+                      background:
+                        "#f8f8f6",
+                      color:
+                        "#555",
+                      padding:
+                        "6px 9px",
+                      cursor:
+                        "pointer",
+                      fontSize: 9
+                    }}
+                  >
+                    + {size}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -933,7 +885,7 @@ function ProductForm({
                 display: "flex",
                 flexDirection:
                   "column",
-                gap: 10,
+                gap: 10
               }}
             >
               <label>
@@ -947,7 +899,7 @@ function ProductForm({
                   flexWrap:
                     "wrap",
                   gap: 8,
-                  minHeight: 4,
+                  minHeight: 4
                 }}
               >
                 {splitValues(
@@ -974,7 +926,7 @@ function ProductForm({
                           "#fff",
                         fontSize: 10,
                         letterSpacing:
-                          ".04em",
+                          ".04em"
                       }}
                     >
                       {color}
@@ -1000,7 +952,7 @@ function ProductForm({
                           color:
                             "#777",
                           cursor:
-                            "pointer",
+                            "pointer"
                         }}
                       >
                         <X size={12} />
@@ -1016,24 +968,19 @@ function ProductForm({
                   display: "flex",
                   gap: 8,
                   alignItems:
-                    "stretch",
+                    "stretch"
                 }}
               >
                 <input
                   value={
                     colorInput
                   }
-                  onChange={(
-                    event
-                  ) =>
+                  onChange={event =>
                     setColorInput(
-                      event.target
-                        .value
+                      event.target.value
                     )
                   }
-                  onKeyDown={(
-                    event
-                  ) =>
+                  onKeyDown={event =>
                     handleListKeyDown(
                       event,
                       "colors",
@@ -1065,7 +1012,7 @@ function ProductForm({
                   display: "flex",
                   flexWrap:
                     "wrap",
-                  gap: 6,
+                  gap: 6
                 }}
               >
                 {[
@@ -1074,37 +1021,35 @@ function ProductForm({
                   "Grey",
                   "Navy",
                   "Cream",
-                  "Brown",
-                ].map(
-                  (color) => (
-                    <button
-                      type="button"
-                      key={color}
-                      onClick={() =>
-                        addListValue(
-                          "colors",
-                          color,
-                          setColorInput
-                        )
-                      }
-                      style={{
-                        border:
-                          "1px solid #deded9",
-                        background:
-                          "#f8f8f6",
-                        color:
-                          "#555",
-                        padding:
-                          "6px 9px",
-                        cursor:
-                          "pointer",
-                        fontSize: 9,
-                      }}
-                    >
-                      + {color}
-                    </button>
-                  )
-                )}
+                  "Brown"
+                ].map(color => (
+                  <button
+                    type="button"
+                    key={color}
+                    onClick={() =>
+                      addListValue(
+                        "colors",
+                        color,
+                        setColorInput
+                      )
+                    }
+                    style={{
+                      border:
+                        "1px solid #deded9",
+                      background:
+                        "#f8f8f6",
+                      color:
+                        "#555",
+                      padding:
+                        "6px 9px",
+                      cursor:
+                        "pointer",
+                      fontSize: 9
+                    }}
+                  >
+                    + {color}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -1223,16 +1168,11 @@ function ProductForm({
               IMAGE URLS
 
               <textarea
-                value={
-                  form.images
-                }
-                onChange={(
-                  event
-                ) =>
+                value={form.images}
+                onChange={event =>
                   update(
                     "images",
-                    event.target
-                      .value
+                    event.target.value
                   )
                 }
                 placeholder="https://... , https://..."
@@ -1276,7 +1216,7 @@ function ProductForm({
 
 function CategoryManager({
   categories,
-  refresh,
+  refresh
 }) {
   const [form, setForm] =
     useState(EMPTY_CATEGORY);
@@ -1291,14 +1231,12 @@ function CategoryManager({
     useState("");
 
   const reset = () => {
-    setForm(
-      EMPTY_CATEGORY
-    );
+    setForm(EMPTY_CATEGORY);
     setEditing(null);
     setError("");
   };
 
-  const edit = (category) => {
+  const edit = category => {
     setEditing(category);
 
     setForm({
@@ -1309,24 +1247,21 @@ function CategoryManager({
         category.slug || "",
 
       description:
-        category.description ||
-        "",
+        category.description || "",
 
       image_url:
-        category.image_url ||
-        "",
+        category.image_url || "",
 
       sort_order:
-        category.sort_order ||
-        0,
+        category.sort_order || 0,
 
       status:
         category.status ||
-        "PUBLISHED",
+        "PUBLISHED"
     });
   };
 
-  const submit = async (event) => {
+  const submit = async event => {
     event.preventDefault();
 
     setSaving(true);
@@ -1349,15 +1284,14 @@ function CategoryManager({
         null,
 
       sort_order:
-        Number(
-          form.sort_order
-        ) || 0,
+        Number(form.sort_order) ||
+        0,
 
       status:
         form.status,
 
       updated_at:
-        new Date().toISOString(),
+        new Date().toISOString()
     };
 
     let result;
@@ -1365,9 +1299,7 @@ function CategoryManager({
     if (editing) {
       result =
         await supabase
-          .from(
-            "categories"
-          )
+          .from("categories")
           .update(payload)
           .eq(
             "id",
@@ -1376,9 +1308,7 @@ function CategoryManager({
     } else {
       result =
         await supabase
-          .from(
-            "categories"
-          )
+          .from("categories")
           .insert(payload);
     }
 
@@ -1396,24 +1326,19 @@ function CategoryManager({
     setSaving(false);
   };
 
-  const remove = async (
-    category
-  ) => {
+  const remove = async category => {
     const confirmed =
       window.confirm(
         `Delete "${category.name}"?`
       );
 
-    if (!confirmed)
-      return;
+    if (!confirmed) return;
 
     const {
-      error: deleteError,
+      error: deleteError
     } =
       await supabase
-        .from(
-          "categories"
-        )
+        .from("categories")
         .delete()
         .eq(
           "id",
@@ -1447,52 +1372,38 @@ function CategoryManager({
 
         <div className="admin-list">
           {categories.map(
-            (category) => (
+            category => (
               <div
                 className="admin-list-row"
-                key={
-                  category.id
-                }
+                key={category.id}
               >
                 <div>
                   <strong>
-                    {
-                      category.name
-                    }
+                    {category.name}
                   </strong>
 
                   <small>
-                    {
-                      category.slug
-                    }
+                    {category.slug}
                   </small>
                 </div>
 
                 <div className="admin-row-actions">
                   <button
                     onClick={() =>
-                      edit(
-                        category
-                      )
+                      edit(category)
                     }
                     className="admin-icon-button"
                   >
-                    <Pencil
-                      size={15}
-                    />
+                    <Pencil size={15} />
                   </button>
 
                   <button
                     onClick={() =>
-                      remove(
-                        category
-                      )
+                      remove(category)
                     }
                     className="admin-icon-button danger"
                   >
-                    <Trash2
-                      size={15}
-                    />
+                    <Trash2 size={15} />
                   </button>
                 </div>
               </div>
@@ -1520,9 +1431,7 @@ function CategoryManager({
           {editing && (
             <button
               className="admin-icon-button"
-              onClick={
-                reset
-              }
+              onClick={reset}
             >
               <X size={16} />
             </button>
@@ -1537,17 +1446,12 @@ function CategoryManager({
             NAME
 
             <input
-              value={
-                form.name
-              }
-              onChange={(
-                event
-              ) =>
+              value={form.name}
+              onChange={event =>
                 setForm({
                   ...form,
-                  name: event
-                    .target
-                    .value,
+                  name:
+                    event.target.value
                 })
               }
               required
@@ -1558,17 +1462,12 @@ function CategoryManager({
             SLUG
 
             <input
-              value={
-                form.slug
-              }
-              onChange={(
-                event
-              ) =>
+              value={form.slug}
+              onChange={event =>
                 setForm({
                   ...form,
-                  slug: event
-                    .target
-                    .value,
+                  slug:
+                    event.target.value
                 })
               }
               placeholder={slugify(
@@ -1584,14 +1483,11 @@ function CategoryManager({
               value={
                 form.description
               }
-              onChange={(
-                event
-              ) =>
+              onChange={event =>
                 setForm({
                   ...form,
                   description:
-                    event.target
-                      .value,
+                    event.target.value
                 })
               }
               rows={4}
@@ -1602,17 +1498,12 @@ function CategoryManager({
             STATUS
 
             <select
-              value={
-                form.status
-              }
-              onChange={(
-                event
-              ) =>
+              value={form.status}
+              onChange={event =>
                 setForm({
                   ...form,
                   status:
-                    event.target
-                      .value,
+                    event.target.value
                 })
               }
             >
@@ -1654,7 +1545,7 @@ function CategoryManager({
 
 export default function Admin({
   user,
-  navigate,
+  navigate
 }) {
   const [sessionUser, setSessionUser] =
     useState(user);
@@ -1675,27 +1566,27 @@ export default function Admin({
     useState(true);
 
   const [view, setView] =
-    useState("products");
+    useState("dashboard");
 
   const [search, setSearch] =
     useState("");
 
   const [
     editingProduct,
-    setEditingProduct,
+    setEditingProduct
   ] = useState(null);
 
   const checkAdmin = async () => {
     setChecking(true);
 
     const {
-      data: sessionData,
+      data: sessionData
     } =
       await supabase.auth.getSession();
 
     const currentUser =
-      sessionData.session
-        ?.user || null;
+      sessionData.session?.user ||
+      null;
 
     setSessionUser(
       currentUser
@@ -1707,7 +1598,9 @@ export default function Admin({
       return;
     }
 
-    const { data: admin } =
+    const {
+      data: admin
+    } =
       await supabase
         .from("admin_users")
         .select(
@@ -1726,62 +1619,51 @@ export default function Admin({
     setChecking(false);
   };
 
-  const loadData =
-    async () => {
-      setLoading(true);
+  const loadData = async () => {
+    setLoading(true);
 
-      const [
-        productsResult,
-        categoriesResult,
-      ] =
-        await Promise.all([
-          supabase
-            .from("products")
-            .select(
-              "*, categories(id, name, slug)"
-            )
-            .order(
-              "created_at",
-              {
-                ascending:
-                  false,
-              }
-            ),
+    const [
+      productsResult,
+      categoriesResult
+    ] =
+      await Promise.all([
+        supabase
+          .from("products")
+          .select(
+            "*, categories(id, name, slug)"
+          )
+          .order(
+            "created_at",
+            {
+              ascending: false
+            }
+          ),
 
-          supabase
-            .from(
-              "categories"
-            )
-            .select("*")
-            .order(
-              "sort_order",
-              {
-                ascending:
-                  true,
-              }
-            ),
-        ]);
+        supabase
+          .from("categories")
+          .select("*")
+          .order(
+            "sort_order",
+            {
+              ascending: true
+            }
+          )
+      ]);
 
-      if (
-        !productsResult.error
-      ) {
-        setProducts(
-          productsResult.data ||
-            []
-        );
-      }
+    if (!productsResult.error) {
+      setProducts(
+        productsResult.data || []
+      );
+    }
 
-      if (
-        !categoriesResult.error
-      ) {
-        setCategories(
-          categoriesResult.data ||
-            []
-        );
-      }
+    if (!categoriesResult.error) {
+      setCategories(
+        categoriesResult.data || []
+      );
+    }
 
-      setLoading(false);
-    };
+    setLoading(false);
+  };
 
   useEffect(() => {
     checkAdmin();
@@ -1804,7 +1686,7 @@ export default function Admin({
         return products;
 
       return products.filter(
-        (product) =>
+        product =>
           product.name
             ?.toLowerCase()
             .includes(term) ||
@@ -1817,20 +1699,17 @@ export default function Admin({
       );
     }, [
       products,
-      search,
+      search
     ]);
 
   const handleProductSaved =
     async () => {
-      setEditingProduct(
-        null
-      );
-
+      setEditingProduct(null);
       await loadData();
     };
 
   const deleteProduct =
-    async (product) => {
+    async product => {
       const confirmed =
         window.confirm(
           `Delete "${product.name}"? This cannot be undone.`
@@ -1839,7 +1718,9 @@ export default function Admin({
       if (!confirmed)
         return;
 
-      const { error } =
+      const {
+        error
+      } =
         await supabase
           .from("products")
           .delete()
@@ -1858,22 +1739,19 @@ export default function Admin({
       await loadData();
     };
 
-  const signOut =
-    async () => {
-      await supabase.auth.signOut();
+  const signOut = async () => {
+    await supabase.auth.signOut();
 
-      setSessionUser(null);
-      setIsAdmin(false);
+    setSessionUser(null);
+    setIsAdmin(false);
 
-      navigate("/");
-    };
+    navigate("/");
+  };
 
   if (checking) {
     return (
       <main className="admin-loading">
-        <RefreshCw
-          size={18}
-        />
+        <RefreshCw size={18} />
 
         Checking admin
         access...
@@ -1887,9 +1765,7 @@ export default function Admin({
   ) {
     return (
       <AdminLogin
-        onLoggedIn={(
-          loggedUser
-        ) => {
+        onLoggedIn={loggedUser => {
           setSessionUser(
             loggedUser
           );
@@ -1938,20 +1814,14 @@ export default function Admin({
 
         <div className="admin-header-actions">
           <span>
-            {
-              sessionUser.email
-            }
+            {sessionUser.email}
           </span>
 
           <button
             className="admin-secondary-button"
-            onClick={
-              signOut
-            }
+            onClick={signOut}
           >
-            <LogOut
-              size={15}
-            />
+            <LogOut size={15} />
 
             SIGN OUT
           </button>
@@ -1960,6 +1830,24 @@ export default function Admin({
 
       <div className="admin-body">
         <aside className="admin-sidebar">
+          <button
+            className={
+              view ===
+              "dashboard"
+                ? "active"
+                : ""
+            }
+            onClick={() =>
+              setView(
+                "dashboard"
+              )
+            }
+          >
+            <Activity size={17} />
+
+            Dashboard
+          </button>
+
           <button
             className={
               view ===
@@ -1973,9 +1861,7 @@ export default function Admin({
               )
             }
           >
-            <Package
-              size={17}
-            />
+            <Package size={17} />
 
             Products
           </button>
@@ -1993,15 +1879,18 @@ export default function Admin({
               )
             }
           >
-            <Tags
-              size={17}
-            />
+            <Tags size={17} />
 
             Categories
           </button>
         </aside>
 
         <section className="admin-content">
+          {view ===
+            "dashboard" && (
+            <AdminDashboard />
+          )}
+
           {view ===
             "products" && (
             <>
@@ -2033,9 +1922,7 @@ export default function Admin({
                     )
                   }
                 >
-                  <Plus
-                    size={16}
-                  />
+                  <Plus size={16} />
 
                   ADD PRODUCT
                 </button>
@@ -2043,21 +1930,14 @@ export default function Admin({
 
               <div className="admin-toolbar">
                 <div className="admin-search">
-                  <Search
-                    size={16}
-                  />
+                  <Search size={16} />
 
                   <input
                     placeholder="Search products..."
-                    value={
-                      search
-                    }
-                    onChange={(
-                      event
-                    ) =>
+                    value={search}
+                    onChange={event =>
                       setSearch(
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
                   />
@@ -2065,14 +1945,10 @@ export default function Admin({
 
                 <button
                   className="admin-icon-button"
-                  onClick={
-                    loadData
-                  }
+                  onClick={loadData}
                   title="Refresh"
                 >
-                  <RefreshCw
-                    size={16}
-                  />
+                  <RefreshCw size={16} />
                 </button>
               </div>
 
@@ -2084,9 +1960,7 @@ export default function Admin({
               ) : filteredProducts.length ===
                 0 ? (
                 <div className="admin-empty">
-                  <Package
-                    size={24}
-                  />
+                  <Package size={24} />
 
                   <h3>
                     No products
@@ -2127,9 +2001,7 @@ export default function Admin({
                   </div>
 
                   {filteredProducts.map(
-                    (
-                      product
-                    ) => (
+                    product => (
                       <div
                         className="admin-table-row"
                         key={
@@ -2137,47 +2009,33 @@ export default function Admin({
                         }
                       >
                         <div className="admin-product-name">
-                          {product
-                            .images?.[0] ? (
+                          {product.images?.[0] ? (
                             <img
                               src={
-                                product
-                                  .images[0]
+                                product.images[0]
                               }
                               alt=""
                             />
                           ) : (
                             <div className="admin-product-placeholder">
-                              <Package
-                                size={
-                                  16
-                                }
-                              />
+                              <Package size={16} />
                             </div>
                           )}
 
                           <div>
                             <strong>
-                              {
-                                product.name
-                              }
+                              {product.name}
                             </strong>
 
                             <small>
-                              {
-                                product.slug
-                              }
+                              {product.slug}
                             </small>
                           </div>
                         </div>
 
                         <div>
-                          {
-                            product
-                              .categories
-                              ?.name ||
-                            "—"
-                          }
+                          {product.categories?.name ||
+                            "—"}
                         </div>
 
                         <div>
@@ -2187,9 +2045,7 @@ export default function Admin({
                         </div>
 
                         <div>
-                          {
-                            product.stock
-                          }
+                          {product.stock}
                         </div>
 
                         <div>
@@ -2199,9 +2055,7 @@ export default function Admin({
                                 ""
                             ).toLowerCase()}`}
                           >
-                            {
-                              product.status
-                            }
+                            {product.status}
                           </span>
                         </div>
 
@@ -2215,11 +2069,7 @@ export default function Admin({
                             }
                             title="Edit"
                           >
-                            <Pencil
-                              size={
-                                15
-                              }
-                            />
+                            <Pencil size={15} />
                           </button>
 
                           <button
@@ -2231,11 +2081,7 @@ export default function Admin({
                             }
                             title="Delete"
                           >
-                            <Trash2
-                              size={
-                                15
-                              }
-                            />
+                            <Trash2 size={15} />
                           </button>
                         </div>
                       </div>
