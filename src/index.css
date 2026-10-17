@@ -2878,4 +2878,50 @@ a {
   .product-image-wrap {
     min-height: 340px;
   }
+}/* =========================================================
+   PENCILBOY — REMOVE PRODUCT IMAGE BOX
+   ========================================================= */
+
+.shop-page {
+  background: #f4f1e9 !important;
+}
+
+.shop-page .product-card {
+  background: transparent !important;
+}
+
+.shop-page .product-image {
+  background: #f4f1e9 !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.shop-page .product-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+
+  /*
+   * Makes white backgrounds in the product photos
+   * blend into the catalogue background.
+   */
+  mix-blend-mode: multiply !important;
+}
+
+/* Make the clothing visually larger */
+@media (max-width: 520px) {
+  .shop-page .product-image {
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  .shop-page .product-image img {
+    transform: scale(1.12);
+  }
+}
+
+@media (min-width: 521px) {
+  .shop-page .product-image img {
+    transform: scale(1.08);
+  }
 }
