@@ -3043,4 +3043,50 @@ a {
     text-align: center !important;
     font-size: 10px !important;
   }
+}/* =========================================================
+   PENCILBOY — NEW IN PRODUCT CARD FINAL SPACING
+   ========================================================= */
+
+@media (max-width: 520px) {
+
+  /* Make the product image area shorter */
+  .shop-page .product-grid-new-in .product-image {
+    aspect-ratio: 1 / 0.72 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    overflow: hidden !important;
+  }
+
+  /* Make the actual clothing mockup MUCH bigger */
+  .shop-page .product-grid-new-in .product-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: scale(1.9) !important;
+    transform-origin: center center !important;
+    mix-blend-mode: multiply !important;
+  }
+
+  /* Bring name and price much closer to the mockup */
+  .shop-page .product-grid-new-in .product-card-info {
+    margin-top: 0 !important;
+    padding: 4px 0 22px !important;
+    display: block !important;
+    text-align: center !important;
+  }
+
+  .shop-page .product-grid-new-in .product-name {
+    margin: 0 !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+  }
+
+  .shop-page .product-grid-new-in .product-card-price {
+    margin: 5px 0 0 !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+  }
 }
