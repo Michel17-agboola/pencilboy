@@ -2974,3 +2974,73 @@ a {
       transform: scale(1.65) !important;
     }
   }
+  /* =========================================================
+   PENCILBOY — PRODUCT NAME & PRICE POLISH
+   ========================================================= */
+
+.shop-page .product-card-info {
+  width: 100%;
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding: 14px 0 0 !important;
+  text-align: left;
+}
+
+.shop-page .product-name {
+  margin: 0 !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+  text-align: left !important;
+}
+
+.shop-page .product-card-price {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  color: #555 !important;
+  white-space: nowrap !important;
+  text-align: right !important;
+}
+
+/* Category pages — keep name and price clean underneath */
+@media (max-width: 520px) {
+  .shop-page .product-card-info {
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding-top: 14px !important;
+  }
+
+  .shop-page .product-name {
+    font-size: 14px !important;
+  }
+
+  .shop-page .product-card-price {
+    font-size: 12px !important;
+  }
+
+  /* For NEW IN, keep the compact 3-column look */
+  .shop-page .product-grid-new-in .product-card-info {
+    display: block !important;
+    text-align: center !important;
+  }
+
+  .shop-page .product-grid-new-in .product-name {
+    text-align: center !important;
+    font-size: 10px !important;
+  }
+
+  .shop-page .product-grid-new-in .product-card-price {
+    margin-top: 6px !important;
+    text-align: center !important;
+    font-size: 10px !important;
+  }
+}
