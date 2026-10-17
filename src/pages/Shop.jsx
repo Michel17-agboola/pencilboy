@@ -9,42 +9,27 @@ export default function Shop({
   saved,
   loading = false,
 }) {
-  const [category, setCategory] =
-    useState("");
+  const [category, setCategory] = useState("");
 
   useEffect(() => {
     const readCategory = () => {
-      const hash =
-        window.location.hash.replace(
-          /^#/,
-          ""
-        );
+      const hash = window.location.hash.replace(/^#/, "");
 
-      const params =
-        new URLSearchParams(
-          hash.split("?")[1] || ""
-        );
+      const params = new URLSearchParams(
+        hash.split("?")[1] || ""
+      );
 
       setCategory(
-        (
-          params.get("category") ||
-          ""
-        ).toLowerCase()
+        (params.get("category") || "").toLowerCase()
       );
     };
 
     readCategory();
 
-    window.addEventListener(
-      "hashchange",
-      readCategory
-    );
+    window.addEventListener("hashchange", readCategory);
 
     return () => {
-      window.removeEventListener(
-        "hashchange",
-        readCategory
-      );
+      window.removeEventListener("hashchange", readCategory);
     };
   }, []);
 
@@ -55,92 +40,66 @@ export default function Shop({
      */
     if (!category) {
       return products.filter(
-        (product) =>
-          product.new_in === true
+        (product) => product.new_in === true
       );
     }
 
-    const categoryRecord =
-      categories.find(
-        (item) =>
-          String(
-            item.slug || ""
-          ).toLowerCase() ===
-          category
-      );
-
-    return products.filter(
-      (product) => {
-        /*
-         * Main method:
-         * product.category_id
-         * matches category.id.
-         */
-        if (
-          categoryRecord &&
-          product.category_id
-        ) {
-          return (
-            String(
-              product.category_id
-            ) ===
-            String(
-              categoryRecord.id
-            )
-          );
-        }
-
-        /*
-         * Fallback if a product already
-         * contains category_slug.
-         */
-        const productCategorySlug =
-          String(
-            product.category_slug ||
-              ""
-          ).toLowerCase();
-
-        if (
-          productCategorySlug
-        ) {
-          return (
-            productCategorySlug ===
-            category
-          );
-        }
-
-        /*
-         * Older fallback using category name.
-         */
-        const productCategoryName =
-          String(
-            product.category || ""
-          ).toLowerCase();
-
-        if (
-          productCategoryName
-        ) {
-          return categories.some(
-            (item) =>
-              String(
-                item.slug || ""
-              ).toLowerCase() ===
-                category &&
-              String(
-                item.name || ""
-              ).toLowerCase() ===
-                productCategoryName
-          );
-        }
-
-        return false;
-      }
+    const categoryRecord = categories.find(
+      (item) =>
+        String(item.slug || "").toLowerCase() === category
     );
-  }, [
-    products,
-    categories,
-    category,
-  ]);
+
+    return products.filter((product) => {
+      /*
+       * Main method:
+       * product.category_id
+       * matches category.id.
+       */
+      if (categoryRecord && product.category_id) {
+        return (
+          String(product.category_id) ===
+          String(categoryRecord.id)
+        );
+      }
+
+      /*
+       * Fallback if a product already
+       * contains category_slug.
+       */
+      const productCategorySlug = String(
+        product.category_slug || ""
+      ).toLowerCase();
+
+      if (productCategorySlug) {
+        return productCategorySlug === category;
+      }
+
+      /*
+       * Older fallback using category name.
+       */
+      const productCategoryName = String(
+        product.category || ""
+      ).toLowerCase();
+
+      if (productCategoryName) {
+        return categories.some(
+          (item) =>
+            String(item.slug || "").toLowerCase() ===
+              category &&
+            String(item.name || "").toLowerCase() ===
+              productCategoryName
+        );
+      }
+
+      return false;
+    });
+  }, [products, categories, category]);
+
+  /*
+   * The page itself determines whether this is NEW IN.
+   * We do not try to guess it from the products.
+   */
+  const isNewIn = !category;
 
   return (
     <section className="shop-page">
@@ -150,6 +109,7 @@ export default function Shop({
         onSave={onSave}
         saved={saved}
         loading={loading}
+        isNewIn={isNewIn}
       />
     </section>
   );
