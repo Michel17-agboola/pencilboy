@@ -5,7 +5,18 @@ export default function ProductGrid({
   onOpen,
   onSave,
   saved = [],
+  loading = false,
+  isNewIn = false,
 }) {
+  if (loading) {
+    return (
+      <div className="empty-block">
+        <span className="eyebrow">PENCILBOY</span>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   if (!products.length) {
     return (
       <div className="empty-block">
@@ -14,12 +25,6 @@ export default function ProductGrid({
       </div>
     );
   }
-
-  const isNewIn =
-    products.length > 0 &&
-    products.every(
-      (product) => product.new_in === true
-    );
 
   return (
     <div
