@@ -2669,3 +2669,152 @@ a {
     object-fit: contain;
   }
 }
+/* =========================================================
+   PENCILBOY — RESPONSIVE PRODUCT CATALOGUE
+   NEW IN = dense multi-column fashion grid
+   OTHER CATEGORIES = larger editorial product grid
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   LARGE DESKTOP
+   --------------------------------------------------------- */
+
+   @media (min-width: 1400px) {
+    .shop-page .product-grid.product-grid-new-in {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      column-gap: 28px;
+      row-gap: 64px;
+    }
+  
+    .shop-page .product-grid.product-grid-category {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: 34px;
+      row-gap: 68px;
+    }
+  }
+  
+  
+  /* ---------------------------------------------------------
+     DESKTOP
+     --------------------------------------------------------- */
+  
+  @media (min-width: 901px) and (max-width: 1399px) {
+    .shop-page .product-grid.product-grid-new-in {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: 32px;
+      row-gap: 68px;
+    }
+  
+    .shop-page .product-grid.product-grid-category {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 38px;
+      row-gap: 72px;
+    }
+  }
+  
+  
+  /* ---------------------------------------------------------
+     TABLET
+     --------------------------------------------------------- */
+  
+  @media (min-width: 521px) and (max-width: 900px) {
+    .shop-page .product-grid.product-grid-new-in {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 18px;
+      row-gap: 46px;
+    }
+  
+    .shop-page .product-grid.product-grid-category {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 20px;
+      row-gap: 52px;
+    }
+  
+    .shop-page .product-name {
+      margin-top: 16px;
+      font-size: 11px;
+    }
+  
+    .shop-page .product-card-price {
+      font-size: 10px;
+    }
+  }
+  
+  
+  /* ---------------------------------------------------------
+     MOBILE
+     --------------------------------------------------------- */
+  
+  @media (max-width: 520px) {
+    .shop-page {
+      padding: 42px 12px 80px;
+    }
+  
+    /* NEW IN — 3 products across */
+    .shop-page .product-grid.product-grid-new-in {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 7px;
+      row-gap: 34px;
+    }
+  
+    /* OTHER CATEGORIES — one large product per row */
+    .shop-page .product-grid.product-grid-category {
+      grid-template-columns: 1fr;
+      column-gap: 0;
+      row-gap: 48px;
+    }
+  
+    .shop-page .product-name {
+      margin-top: 12px;
+      font-size: 10px;
+      letter-spacing: .015em;
+    }
+  
+    .shop-page .product-card-price {
+      margin-top: 6px;
+      font-size: 9px;
+    }
+  
+    /* Keep NEW IN information extremely clean */
+    .product-grid-new-in .product-card-info {
+      gap: 4px;
+    }
+  
+    .product-grid-new-in .product-card-price {
+      font-size: 9px;
+    }
+  
+    /* Larger images for normal category browsing */
+    .product-grid-category .product-image {
+      aspect-ratio: 1 / 1;
+    }
+  }
+  
+  
+  /* ---------------------------------------------------------
+     VERY SMALL PHONES
+     --------------------------------------------------------- */
+  
+  @media (max-width: 380px) {
+    .shop-page {
+      padding-left: 9px;
+      padding-right: 9px;
+    }
+  
+    .shop-page .product-grid.product-grid-new-in {
+      column-gap: 5px;
+      row-gap: 28px;
+    }
+  
+    .shop-page .product-grid.product-grid-category {
+      row-gap: 42px;
+    }
+  
+    .shop-page .product-name {
+      font-size: 9px;
+    }
+  
+    .shop-page .product-card-price {
+      font-size: 8px;
+    }
+  }
