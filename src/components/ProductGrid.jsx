@@ -1,6 +1,11 @@
 import ProductCard from "./ProductCard";
 
-export default function ProductGrid({ products = [], onOpen, onSave, saved = [] }) {
+export default function ProductGrid({
+  products = [],
+  onOpen,
+  onSave,
+  saved = [],
+}) {
   if (!products.length) {
     return (
       <div className="empty-block">
@@ -10,10 +15,28 @@ export default function ProductGrid({ products = [], onOpen, onSave, saved = [] 
     );
   }
 
+  const isNewIn =
+    products.length > 0 &&
+    products.every(
+      (product) => product.new_in === true
+    );
+
   return (
-    <div className="product-grid">
+    <div
+      className={`product-grid ${
+        isNewIn
+          ? "product-grid-new-in"
+          : "product-grid-category"
+      }`}
+    >
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} onOpen={onOpen} onSave={onSave} saved={saved} />
+        <ProductCard
+          key={product.id}
+          product={product}
+          onOpen={onOpen}
+          onSave={onSave}
+          saved={saved}
+        />
       ))}
     </div>
   );
