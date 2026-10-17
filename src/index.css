@@ -3090,3 +3090,154 @@ a {
     text-align: center !important;
   }
 }
+/* =========================================================
+   PENCILBOY — NEW IN ONLY
+   BIGGER MOCKUPS + TIGHTER PRODUCT INFO
+   ========================================================= */
+
+/* NEW IN ONLY — desktop */
+.shop-page .product-grid-new-in .product-image-wrap {
+  min-height: 0 !important;
+}
+
+.shop-page .product-grid-new-in .product-image {
+  min-height: 0 !important;
+  height: 330px !important;
+  aspect-ratio: auto !important;
+}
+
+.shop-page .product-grid-new-in .product-image img {
+  transform: scale(1.38) !important;
+  transform-origin: center center !important;
+}
+
+/* Keep product information close to the mockup */
+.shop-page .product-grid-new-in .product-card-info {
+  margin-top: 10px !important;
+  gap: 8px !important;
+}
+
+.shop-page .product-grid-new-in .product-name {
+  margin-top: 0 !important;
+}
+
+.shop-page .product-grid-new-in .product-card-price {
+  margin-top: 4px !important;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (min-width: 521px) and (max-width: 900px) {
+
+  .shop-page .product-grid-new-in .product-image-wrap {
+    min-height: 0 !important;
+  }
+
+  .shop-page .product-grid-new-in .product-image {
+    height: 270px !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+  }
+
+  .shop-page .product-grid-new-in .product-image img {
+    transform: scale(1.45) !important;
+    transform-origin: center center !important;
+  }
+
+  .shop-page .product-grid-new-in .product-card-info {
+    margin-top: 10px !important;
+    gap: 8px !important;
+  }
+
+  .shop-page .product-grid-new-in .product-name {
+    margin-top: 0 !important;
+  }
+
+  .shop-page .product-grid-new-in .product-card-price {
+    margin-top: 4px !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE — THIS IS THE IMPORTANT ONE FOR YOUR iPHONE
+   ========================================================= */
+
+@media (max-width: 520px) {
+
+  /* Remove the huge invisible image space */
+  .shop-page .product-grid-new-in .product-image-wrap {
+    min-height: 0 !important;
+    height: 205px !important;
+  }
+
+  /* Make the image area shorter and tighter */
+  .shop-page .product-grid-new-in .product-image {
+    width: 100% !important;
+    height: 205px !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    overflow: hidden !important;
+  }
+
+  /* BIGGER CLOTHING MOCKUP */
+  .shop-page .product-grid-new-in .product-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: scale(1.55) !important;
+    transform-origin: center center !important;
+  }
+
+  /* Bring name immediately under the mockup */
+  .shop-page .product-grid-new-in .product-card-info {
+    margin-top: 8px !important;
+    gap: 0 !important;
+    display: block !important;
+  }
+
+  .shop-page .product-grid-new-in .product-name {
+    margin-top: 0 !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Price directly underneath */
+  .shop-page .product-grid-new-in .product-card-price {
+    margin-top: 4px !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Tighten the space before the next row */
+  .shop-page .product-grid.product-grid-new-in {
+    row-gap: 28px !important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .shop-page .product-grid-new-in .product-image-wrap {
+    height: 185px !important;
+  }
+
+  .shop-page .product-grid-new-in .product-image {
+    height: 185px !important;
+  }
+
+  .shop-page .product-grid-new-in .product-image img {
+    transform: scale(1.48) !important;
+  }
+
+  .shop-page .product-grid.product-grid-new-in {
+    row-gap: 24px !important;
+  }
+}
