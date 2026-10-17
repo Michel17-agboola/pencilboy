@@ -2818,3 +2818,64 @@ a {
       font-size: 8px;
     }
   }
+  /* =========================================================
+   PENCILBOY — CLEAN PRODUCT CATALOGUE IMAGES
+   ========================================================= */
+
+.product-grid {
+  background: #f4f1e9;
+}
+
+.product-card {
+  background: transparent !important;
+}
+
+.product-card-image,
+.product-card-media,
+.product-image-wrap {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove the white image/card treatment */
+.product-card img {
+  background: transparent !important;
+  mix-blend-mode: multiply;
+}
+
+/* Make the actual clothing larger */
+.product-card-image img,
+.product-card-media img,
+.product-image-wrap img,
+.product-card > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Give the product more visual presence */
+.product-card-image,
+.product-card-media,
+.product-image-wrap {
+  min-height: 320px;
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  .product-card-image,
+  .product-card-media,
+  .product-image-wrap {
+    min-height: 260px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 521px) and (max-width: 900px) {
+  .product-card-image,
+  .product-card-media,
+  .product-image-wrap {
+    min-height: 340px;
+  }
+}
