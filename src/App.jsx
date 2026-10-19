@@ -20,6 +20,8 @@ import { supabase } from "./lib/supabase";
 import {
   trackVisitor,
   trackCartAdd,
+  saveProductLike,
+  removeProductLike,
 } from "./lib/storeTracking";
 import {
   FALLBACK_PRODUCTS,
@@ -145,11 +147,6 @@ export default function App() {
    * -------------------------------------------------------
    * VISITOR TRACKING
    * -------------------------------------------------------
-   *
-   * A visitor is recorded when they enter the storefront.
-   *
-   * We intentionally do not track the Admin page as a
-   * storefront visitor.
    */
 
   useEffect(() => {
@@ -178,8 +175,8 @@ export default function App() {
    * LOCAL SAVED STATE
    * -------------------------------------------------------
    *
-   * This remains temporarily while we build the persistent
-   * Supabase Likes system in the next step.
+   * This remains temporarily while the persistent
+   * Supabase Likes system is being completed.
    */
 
   useEffect(() => {
@@ -280,33 +277,90 @@ export default function App() {
    * -------------------------------------------------------
    */
 
-  const openProduct = (product) =>
+  const openProduct = (product) => {
+    if (!product) {
+      return;
+    }
+
+    const productSlug =
+      product.slug ||
+      slugify(product.name);
+
+    if (!productSlug) {
+      return;
+    }
+
     navigate(
-      `/product/${
-        product.slug ||
-        slugify(product.name)
-      }`
+      `/product/${encodeURIComponent(
+        productSlug
+      )}`
     );
+  };
 
   /*
    * -------------------------------------------------------
    * SAVE / LIKE
    * -------------------------------------------------------
    *
-   * The actual persistent Supabase Likes system comes next.
-   * For now we preserve the existing working UI behavior.
+   * Persistent Supabase Likes will replace this local
+   * behaviour in the next step.
    */
 
-  const onSave = (id) => {
+  const onSave = async (id) => {
+    if (!id) {
+      return;
+    }
+  
+    const isCurrentlySaved =
+      saved.includes(id);
+  
+    /*
+     * Update the UI immediately so the heart
+     * feels instant.
+     */
     setSaved((current) =>
-      current.includes(id)
+      isCurrentlySaved
         ? current.filter(
             (item) => item !== id
           )
         : [...current, id]
     );
+  
+    /*
+     * Persist the like in Supabase.
+     */
+    if (isCurrentlySaved) {
+      const success =
+        await removeProductLike(id);
+  
+      /*
+       * If Supabase failed, restore the
+       * previous UI state.
+       */
+      if (!success) {
+        setSaved((current) =>
+          current.includes(id)
+            ? current
+            : [...current, id]
+        );
+      }
+    } else {
+      const success =
+        await saveProductLike(id);
+  
+      /*
+       * If Supabase failed, restore the
+       * previous UI state.
+       */
+      if (!success) {
+        setSaved((current) =>
+          current.filter(
+            (item) => item !== id
+          )
+        );
+      }
+    }
   };
-
   /*
    * -------------------------------------------------------
    * ADD TO CART
@@ -351,10 +405,9 @@ export default function App() {
     });
 
     /*
-     * Record the cart addition in Supabase.
+     * Record cart addition in Supabase.
      *
-     * Tracking is intentionally non-blocking.
-     * If tracking fails, the customer's cart still works.
+     * Tracking is non-blocking.
      */
     trackCartAdd(
       product?.id,
@@ -368,16 +421,72 @@ export default function App() {
    * -------------------------------------------------------
    * SELECTED PRODUCT
    * -------------------------------------------------------
+   *
+   * Product URLs can come from:
+   *
+   *   /product/product-slug
+   *
+   * We resolve products using several safe identifiers:
+   *
+   * 1. Exact slug
+   * 2. Normalised slug
+   * 3. Slug generated from product name
+   * 4. Product ID
+   *
+   * This prevents valid products from falling through
+   * to the Home page.
    */
 
-  const selectedProduct =
+  const productRouteSlug =
     route.startsWith("/product/")
-      ? products.find(
-          (product) =>
-            (product.slug ||
-              slugify(product.name)) ===
-            route.split("/")[2]
-        )
+      ? route
+          .slice("/product/".length)
+          .split("?")[0]
+      : "";
+
+  let decodedProductSlug = "";
+
+  try {
+    decodedProductSlug = decodeURIComponent(
+      productRouteSlug
+    );
+  } catch {
+    decodedProductSlug = productRouteSlug;
+  }
+
+  const normalizedProductSlug =
+    decodedProductSlug
+      .toLowerCase()
+      .trim();
+
+  const selectedProduct =
+    normalizedProductSlug
+      ? products.find((product) => {
+          const exactSlug = String(
+            product.slug || ""
+          )
+            .toLowerCase()
+            .trim();
+
+          const generatedSlug = slugify(
+            product.name
+          );
+
+          const productId = String(
+            product.id || ""
+          )
+            .toLowerCase()
+            .trim();
+
+          return (
+            exactSlug ===
+              normalizedProductSlug ||
+            generatedSlug ===
+              normalizedProductSlug ||
+            productId ===
+              normalizedProductSlug
+          );
+        })
       : null;
 
   let page;
@@ -512,19 +621,89 @@ export default function App() {
       break;
 
     default:
-      page = selectedProduct ? (
-        <Product
-          product={selectedProduct}
-          onBack={() =>
-            navigate("/shop")
-          }
-          addToBag={addToBag}
-        />
-      ) : (
-        <Home
-          navigate={navigate}
-        />
-      );
+      /*
+       * IMPORTANT:
+       *
+       * Previously, any product that could not be resolved
+       * was silently sent to Home.
+       *
+       * Now we only show the product page when the product
+       * actually exists.
+       *
+       * If the route is a product route but the product
+       * cannot be found, we show a proper not-found state
+       * instead of pretending the user requested Home.
+       */
+
+      if (
+        baseRoute.startsWith(
+          "/product/"
+        )
+      ) {
+        page = selectedProduct ? (
+          <Product
+            product={selectedProduct}
+            onBack={() =>
+              navigate("/shop")
+            }
+            addToBag={addToBag}
+          />
+        ) : (
+          <section
+            className="empty-block"
+            style={{
+              minHeight:
+                "60vh",
+              padding:
+                "80px 20px",
+            }}
+          >
+            <span className="eyebrow">
+              PENCILBOY
+            </span>
+
+            <h2
+              style={{
+                margin:
+                  "16px 0",
+              }}
+            >
+              PRODUCT NOT FOUND
+            </h2>
+
+            <p>
+              This product is
+              no longer
+              available.
+            </p>
+
+            <button
+              type="button"
+              className="landing-enter"
+              style={{
+                color: "#111",
+                borderBottom:
+                  "1px solid #111",
+                marginTop:
+                  "24px",
+              }}
+              onClick={() =>
+                navigate("/shop")
+              }
+            >
+              BACK TO SHOP
+            </button>
+          </section>
+        );
+      } else {
+        page = (
+          <Home
+            navigate={navigate}
+          />
+        );
+      }
+
+      break;
   }
 
   const isLandingPage =

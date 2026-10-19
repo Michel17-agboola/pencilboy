@@ -2670,474 +2670,459 @@ a {
   }
 }
 /* =========================================================
-   PENCILBOY — BOLAPSD INSPIRED RESPONSIVE STORE
-   Layout system:
-   Phone  = 2 columns
-   Tablet = 3 columns
-   Laptop = 4 columns
-   Wide   = 5 columns
+   PENCILBOY — RESPONSIVE PRODUCT CATALOGUE
+   NEW IN = dense multi-column fashion grid
+   OTHER CATEGORIES = larger editorial product grid
    ========================================================= */
 
+/* ---------------------------------------------------------
+   LARGE DESKTOP
+   --------------------------------------------------------- */
 
-/* =========================================================
-   LANDING — ONLY ENTER
+   @media (min-width: 1400px) {
+    .shop-page .product-grid.product-grid-new-in {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      column-gap: 28px;
+      row-gap: 64px;
+    }
+  
+    .shop-page .product-grid.product-grid-category {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: 34px;
+      row-gap: 68px;
+    }
+  }
+  
+  
+  /* ---------------------------------------------------------
+     DESKTOP
+     --------------------------------------------------------- */
+  
+  @media (min-width: 901px) and (max-width: 1399px) {
+    .shop-page .product-grid.product-grid-new-in {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: 32px;
+      row-gap: 68px;
+    }
+  
+    .shop-page .product-grid.product-grid-category {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 38px;
+      row-gap: 72px;
+    }
+  }
+  
+  
+  /* ---------------------------------------------------------
+     TABLET
+     --------------------------------------------------------- */
+  
+  @media (min-width: 521px) and (max-width: 900px) {
+    .shop-page .product-grid.product-grid-new-in {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 18px;
+      row-gap: 46px;
+    }
+  
+    .shop-page .product-grid.product-grid-category {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 20px;
+      row-gap: 52px;
+    }
+  
+    .shop-page .product-name {
+      margin-top: 16px;
+      font-size: 11px;
+    }
+  
+    .shop-page .product-card-price {
+      font-size: 10px;
+    }
+  }
+  
+  
+  /* ---------------------------------------------------------
+     MOBILE
+     --------------------------------------------------------- */
+  
+  @media (max-width: 520px) {
+    .shop-page {
+      padding: 42px 12px 80px;
+    }
+  
+    /* NEW IN — 3 products across */
+    .shop-page .product-grid.product-grid-new-in {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 7px;
+      row-gap: 34px;
+    }
+  
+    /* OTHER CATEGORIES — one large product per row */
+    .shop-page .product-grid.product-grid-category {
+      grid-template-columns: 1fr;
+      column-gap: 0;
+      row-gap: 48px;
+    }
+  
+    .shop-page .product-name {
+      margin-top: 12px;
+      font-size: 10px;
+      letter-spacing: .015em;
+    }
+  
+    .shop-page .product-card-price {
+      margin-top: 6px;
+      font-size: 9px;
+    }
+  
+    /* Keep NEW IN information extremely clean */
+    .product-grid-new-in .product-card-info {
+      gap: 4px;
+    }
+  
+    .product-grid-new-in .product-card-price {
+      font-size: 9px;
+    }
+  
+    /* Larger images for normal category browsing */
+    .product-grid-category .product-image {
+      aspect-ratio: 1 / 1;
+    }
+  }
+  
+  
+  /* ---------------------------------------------------------
+     VERY SMALL PHONES
+     --------------------------------------------------------- */
+  
+  @media (max-width: 380px) {
+    .shop-page {
+      padding-left: 9px;
+      padding-right: 9px;
+    }
+  
+    .shop-page .product-grid.product-grid-new-in {
+      column-gap: 5px;
+      row-gap: 28px;
+    }
+  
+    .shop-page .product-grid.product-grid-category {
+      row-gap: 42px;
+    }
+  
+    .shop-page .product-name {
+      font-size: 9px;
+    }
+  
+    .shop-page .product-card-price {
+      font-size: 8px;
+    }
+  }
+  /* =========================================================
+   PENCILBOY — CLEAN PRODUCT CATALOGUE IMAGES
    ========================================================= */
 
-.landing-copy {
-  justify-content: center;
+.product-grid {
+  background: #f4f1e9;
 }
 
-.landing-kicker,
-.landing-copy h1,
-.landing-copy p,
-.landing-scroll {
-  display: none !important;
+.product-card {
+  background: transparent !important;
 }
 
-.landing-enter {
-  margin: 0;
+.product-card-image,
+.product-card-media,
+.product-image-wrap {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-
-/* =========================================================
-   STORE HEADER
-   ========================================================= */
-
-.store-header {
-  min-height: 112px;
+/* Remove the white image/card treatment */
+.product-card img {
+  background: transparent !important;
+  mix-blend-mode: multiply;
 }
 
-.store-menu,
-.store-bag {
-  top: 18px;
-}
-
-.category-nav {
-  padding-top: 68px;
-}
-
-
-/* =========================================================
-   SHOP GRID
-   ========================================================= */
-
-.shop-page {
-  padding: 42px 24px 100px;
-}
-
-.shop-page .product-grid {
-  width: 100%;
-  max-width: 1800px;
-  margin: 0 auto;
-
-  display: grid;
-  grid-template-columns: repeat(
-    4,
-    minmax(0, 1fr)
-  );
-
-  column-gap: 20px;
-  row-gap: 52px;
-}
-
-.shop-page .product-card {
-  min-width: 0;
-  text-align: left;
-}
-
-.shop-page .product-image {
-  aspect-ratio: 1 / 1.12;
-  background: #f7f7f7;
-}
-
-.shop-page .product-card-info {
-  padding-top: 0;
-}
-
-.shop-page .product-name {
-  margin-top: 18px;
-  font-size: 12px;
-  line-height: 1.25;
-  letter-spacing: .01em;
-}
-
-.shop-page .product-card-price {
-  margin-top: 18px;
-  font-size: 11px;
-  color: #555;
-}
-
-
-/* =========================================================
-   PRODUCT PAGE — BOLAPSD STYLE
-   ========================================================= */
-
-.product-detail {
-  width: 100%;
-  max-width: 1600px;
-  padding: 42px 4vw 120px;
-}
-
-.back-link {
-  margin-bottom: 34px;
-  color: #555;
-}
-
-.product-detail-grid {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1.05fr)
-    minmax(390px, .75fr);
-
-  gap: clamp(
-    50px,
-    8vw,
-    150px
-  );
-
-  align-items: start;
-}
-
-.product-gallery {
-  min-width: 0;
-}
-
-.product-main-image {
-  position: relative;
-  width: 100%;
-  background: #f7f7f7;
-  overflow: hidden;
-}
-
-.product-main-image img {
-  width: 100%;
-  aspect-ratio: 1 / 1.18;
-  object-fit: contain;
-}
-
-.product-image-count {
-  position: absolute;
-  bottom: 18px;
-  right: 18px;
-
-  padding: 7px 9px;
-
-  background: rgba(
-    255,
-    255,
-    255,
-    .9
-  );
-
-  font-size: 10px;
-  letter-spacing: .08em;
-}
-
-.product-thumbnails {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-  overflow-x: auto;
-}
-
-.product-thumbnails button {
-  flex: 0 0 72px;
-
-  width: 72px;
-  height: 88px;
-
-  padding: 0;
-
-  background: #f7f7f7;
-  border: 1px solid transparent;
-  overflow: hidden;
-}
-
-.product-thumbnails button.active {
-  border-color: #111;
-}
-
-.product-thumbnails img {
+/* Make the actual clothing larger */
+.product-card-image img,
+.product-card-media img,
+.product-image-wrap img,
+.product-card > img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center;
 }
 
+/* Give the product more visual presence */
+.product-card-image,
+.product-card-media,
+.product-image-wrap {
+  min-height: 320px;
+}
 
-/* =========================================================
-   PRODUCT INFO
+/* Mobile */
+@media (max-width: 520px) {
+  .product-card-image,
+  .product-card-media,
+  .product-image-wrap {
+    min-height: 260px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 521px) and (max-width: 900px) {
+  .product-card-image,
+  .product-card-media,
+  .product-image-wrap {
+    min-height: 340px;
+  }
+}/* =========================================================
+   PENCILBOY — REMOVE PRODUCT IMAGE BOX
    ========================================================= */
 
-.product-info {
-  position: sticky;
-  top: 130px;
-
-  max-width: 620px;
+.shop-page {
+  background: #f4f1e9 !important;
 }
 
-.product-detail-category {
-  display: block;
-
-  margin-bottom: 20px;
-
-  font-size: 10px;
-  letter-spacing: .14em;
-  color: #666;
-  text-transform: uppercase;
+.shop-page .product-card {
+  background: transparent !important;
 }
 
-.product-info h1 {
-  margin: 0 0 24px;
-
-  max-width: 600px;
-
-  font-size: clamp(
-    38px,
-    4.4vw,
-    74px
-  );
-
-  line-height: .92;
-  letter-spacing: -.055em;
-  font-weight: 800;
+.shop-page .product-image {
+  background: #f4f1e9 !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: hidden;
 }
 
-.product-price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-bottom: 10px;
+.shop-page .product-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+
+  /*
+   * Makes white backgrounds in the product photos
+   * blend into the catalogue background.
+   */
+  mix-blend-mode: multiply !important;
 }
 
-.detail-price {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 500;
+/* Make the clothing visually larger */
+@media (max-width: 520px) {
+  .shop-page .product-image {
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  .shop-page .product-image img {
+    transform: scale(1.12);
+  }
 }
 
-.compare-price {
-  color: #888;
-  font-size: 13px;
-  text-decoration: line-through;
+@media (min-width: 521px) {
+  .shop-page .product-image img {
+    transform: scale(1.08);
+  }
 }
-
-.sold-out-label {
-  display: inline-block;
-
-  margin: 8px 0;
-
-  font-size: 10px;
-  letter-spacing: .1em;
-  font-weight: 700;
-}
-
-.product-shipping-note {
-  margin: 0 0 36px !important;
-
-  max-width: none !important;
-
-  color: #666;
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-
 /* =========================================================
-   OPTIONS
+   PENCILBOY — FINAL PRODUCT MOCKUP SIZE
    ========================================================= */
 
-.option-block {
-  margin-top: 30px;
-}
-
-.option-heading,
-.product-quantity-block > span {
-  display: block;
-
-  margin-bottom: 12px;
-
-  font-size: 11px;
-  letter-spacing: .08em;
-  font-weight: 600;
-}
-
-.size-row,
-.color-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.size-row button,
-.color-row button {
-  min-width: 58px;
-
-  min-height: 46px;
-
-  padding: 10px 16px;
-
-  border: 1px solid #ddd;
-  background: #fff;
-
-  font-size: 11px;
-
-  transition:
-    border-color .2s ease,
-    background .2s ease,
-    color .2s ease;
-}
-
-.size-row button:hover,
-.color-row button:hover {
-  border-color: #111;
-}
-
-.size-row button.selected,
-.color-row button.selected {
-  background: #111;
-  border-color: #111;
-  color: #fff;
-}
-
-.size-row button:disabled {
-  opacity: .4;
-  cursor: not-allowed;
-}
-
-
-/* =========================================================
-   QUANTITY
+   .shop-page .product-image {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    display: block !important;
+  }
+  
+  .shop-page .product-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  
+    /* BIGGER CLOTHING */
+    transform: scale(1.65) !important;
+    transform-origin: center center !important;
+  
+    mix-blend-mode: multiply !important;
+  }
+  
+  /* NEW IN — keep the 3-column layout */
+  @media (max-width: 520px) {
+    .shop-page .product-grid.product-grid-new-in {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      column-gap: 7px !important;
+    }
+  
+    .shop-page .product-image img {
+      transform: scale(1.65) !important;
+    }
+  }
+  
+  /* CATEGORY PAGES — one large product */
+  @media (max-width: 520px) {
+    .shop-page .product-grid.product-grid-category {
+      grid-template-columns: 1fr !important;
+    }
+  
+    .shop-page .product-grid.product-grid-category .product-image img {
+      transform: scale(1.65) !important;
+    }
+  }
+  /* =========================================================
+   PENCILBOY — PRODUCT NAME & PRICE POLISH
    ========================================================= */
 
-.product-quantity-block {
-  margin-top: 34px;
-}
-
-.quantity-control {
-  display: inline-flex;
-  align-items: center;
-
-  height: 48px;
-
-  border: 1px solid #111;
-}
-
-.quantity-control button {
-  width: 46px;
-  height: 46px;
-
-  display: grid;
-  place-items: center;
-}
-
-.quantity-control strong {
-  width: 48px;
-
-  text-align: center;
-
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.quantity-control button:hover {
-  background: #f5f5f5;
-}
-
-
-/* =========================================================
-   ADD TO CART
-   ========================================================= */
-
-.product-add-cart {
+.shop-page .product-card-info {
   width: 100%;
-
-  min-height: 56px;
-
-  margin-top: 30px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: #111;
-  color: #fff;
-
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .12em;
-
-  transition:
-    opacity .2s ease,
-    transform .2s ease;
-}
-
-.product-add-cart:hover {
-  opacity: .86;
-}
-
-.product-add-cart:active {
-  transform: scale(.99);
-}
-
-.product-add-cart:disabled {
-  background: #ddd;
-  color: #777;
-  cursor: not-allowed;
-}
-
-
-/* =========================================================
-   PRODUCT ACCORDIONS
-   ========================================================= */
-
-.product-accordions {
-  margin-top: 42px;
-
-  border-top: 1px solid #ddd;
-}
-
-.product-accordion {
-  border-bottom: 1px solid #ddd;
-}
-
-.product-accordion > button {
-  width: 100%;
-
-  min-height: 64px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding: 14px 0 0 !important;
   text-align: left;
-
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .06em;
 }
 
-.product-accordion > button svg {
-  transition:
-    transform .25s ease;
+.shop-page .product-name {
+  margin: 0 !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+  text-align: left !important;
 }
 
-.product-accordion > button svg.open {
-  transform: rotate(180deg);
+.shop-page .product-card-price {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  color: #555 !important;
+  white-space: nowrap !important;
+  text-align: right !important;
 }
 
-.product-accordion-content {
-  padding: 0 0 24px;
+/* Category pages — keep name and price clean underneath */
+@media (max-width: 520px) {
+  .shop-page .product-card-info {
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding-top: 14px !important;
+  }
 
-  max-width: 560px;
+  .shop-page .product-name {
+    font-size: 14px !important;
+  }
 
-  color: #555;
+  .shop-page .product-card-price {
+    font-size: 12px !important;
+  }
 
-  font-size: 13px;
-  line-height: 1.7;
+  /* For NEW IN, keep the compact 3-column look */
+  .shop-page .product-grid-new-in .product-card-info {
+    display: block !important;
+    text-align: center !important;
+  }
+
+  .shop-page .product-grid-new-in .product-name {
+    text-align: center !important;
+    font-size: 10px !important;
+  }
+
+  .shop-page .product-grid-new-in .product-card-price {
+    margin-top: 6px !important;
+    text-align: center !important;
+    font-size: 10px !important;
+  }
+}/* =========================================================
+   PENCILBOY — NEW IN PRODUCT CARD FINAL SPACING
+   ========================================================= */
+
+@media (max-width: 520px) {
+
+  /* Make the product image area shorter */
+  .shop-page .product-grid-new-in .product-image {
+    aspect-ratio: 1 / 0.72 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    overflow: hidden !important;
+  }
+
+  /* Make the actual clothing mockup MUCH bigger */
+  .shop-page .product-grid-new-in .product-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: scale(1.9) !important;
+    transform-origin: center center !important;
+    mix-blend-mode: multiply !important;
+  }
+
+  /* Bring name and price much closer to the mockup */
+  .shop-page .product-grid-new-in .product-card-info {
+    margin-top: 0 !important;
+    padding: 4px 0 22px !important;
+    display: block !important;
+    text-align: center !important;
+  }
+
+  .shop-page .product-grid-new-in .product-name {
+    margin: 0 !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+  }
+
+  .shop-page .product-grid-new-in .product-card-price {
+    margin: 5px 0 0 !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+  }
+}
+/* =========================================================
+   PENCILBOY — NEW IN ONLY
+   BIGGER MOCKUPS + TIGHTER PRODUCT INFO
+   ========================================================= */
+
+/* NEW IN ONLY — desktop */
+.shop-page .product-grid-new-in .product-image-wrap {
+  min-height: 0 !important;
 }
 
-.product-accordion-content p {
-  margin: 0;
+.shop-page .product-grid-new-in .product-image {
+  min-height: 0 !important;
+  height: 330px !important;
+  aspect-ratio: auto !important;
+}
+
+.shop-page .product-grid-new-in .product-image img {
+  transform: scale(1.38) !important;
+  transform-origin: center center !important;
+}
+
+/* Keep product information close to the mockup */
+.shop-page .product-grid-new-in .product-card-info {
+  margin-top: 10px !important;
+  gap: 8px !important;
+}
+
+.shop-page .product-grid-new-in .product-name {
+  margin-top: 0 !important;
+}
+
+.shop-page .product-grid-new-in .product-card-price {
+  margin-top: 4px !important;
 }
 
 
@@ -3145,264 +3130,91 @@ a {
    TABLET
    ========================================================= */
 
-@media (max-width: 1100px) {
-  .shop-page .product-grid {
-    grid-template-columns:
-      repeat(
-        3,
-        minmax(0, 1fr)
-      );
+@media (min-width: 521px) and (max-width: 900px) {
 
-    column-gap: 16px;
-    row-gap: 46px;
+  .shop-page .product-grid-new-in .product-image-wrap {
+    min-height: 0 !important;
   }
 
-  .product-detail {
-    padding-left: 28px;
-    padding-right: 28px;
+  .shop-page .product-grid-new-in .product-image {
+    height: 270px !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
   }
 
-  .product-detail-grid {
-    grid-template-columns:
-      minmax(0, 1fr)
-      minmax(330px, .75fr);
-
-    gap: 50px;
+  .shop-page .product-grid-new-in .product-image img {
+    transform: scale(1.45) !important;
+    transform-origin: center center !important;
   }
 
-  .product-info h1 {
-    font-size: clamp(
-      38px,
-      5vw,
-      62px
-    );
+  .shop-page .product-grid-new-in .product-card-info {
+    margin-top: 10px !important;
+    gap: 8px !important;
+  }
+
+  .shop-page .product-grid-new-in .product-name {
+    margin-top: 0 !important;
+  }
+
+  .shop-page .product-grid-new-in .product-card-price {
+    margin-top: 4px !important;
   }
 }
 
 
 /* =========================================================
-   MOBILE / PHONE
+   MOBILE — THIS IS THE IMPORTANT ONE FOR YOUR iPHONE
    ========================================================= */
 
-@media (max-width: 700px) {
-  .store-header {
-    min-height: 66px;
+@media (max-width: 520px) {
+
+  /* Remove the huge invisible image space */
+  .shop-page .product-grid-new-in .product-image-wrap {
+    min-height: 0 !important;
+    height: 205px !important;
   }
 
-  .store-menu,
-  .store-bag {
-    top: 8px;
-
-    width: 48px;
-    height: 48px;
+  /* Make the image area shorter and tighter */
+  .shop-page .product-grid-new-in .product-image {
+    width: 100% !important;
+    height: 205px !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    overflow: hidden !important;
   }
 
-  .store-menu {
-    left: 8px;
+  /* BIGGER CLOTHING MOCKUP */
+  .shop-page .product-grid-new-in .product-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: scale(1.55) !important;
+    transform-origin: center center !important;
   }
 
-  .store-bag {
-    right: 8px;
+  /* Bring name immediately under the mockup */
+  .shop-page .product-grid-new-in .product-card-info {
+    margin-top: 8px !important;
+    gap: 0 !important;
+    display: block !important;
   }
 
-  /*
-   * On phone the reference uses a clean
-   * hamburger / logo / cart header.
-   *
-   * Categories remain available inside
-   * the menu instead of consuming screen
-   * height.
-   */
-  .category-nav {
-    display: none;
+  .shop-page .product-grid-new-in .product-name {
+    margin-top: 0 !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
   }
 
-  .store-header > .brand-logo {
-    top: 0;
-
-    width: 76px;
-    height: 58px;
+  /* Price directly underneath */
+  .shop-page .product-grid-new-in .product-card-price {
+    margin-top: 4px !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
   }
 
-  .store-header > .brand-logo img {
-    width: 62px;
-    height: 48px;
-  }
-
-
-  /* SHOP */
-
-  .shop-page {
-    padding:
-      18px
-      10px
-      80px;
-  }
-
-  .shop-page .product-grid {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(0, 1fr)
-      );
-
-    column-gap: 8px;
-    row-gap: 34px;
-  }
-
-  .shop-page .product-image {
-    aspect-ratio: 1 / 1.18;
-  }
-
-  .shop-page .product-name {
-    margin-top: 12px;
-
-    font-size: 10px;
-    line-height: 1.3;
-  }
-
-  .shop-page .product-card-price {
-    margin-top: 7px;
-
-    font-size: 10px;
-  }
-
-  .product-save {
-    top: 8px;
-    right: 8px;
-
-    width: 30px;
-    height: 30px;
-
-    font-size: 16px;
-  }
-
-
-  /* PRODUCT */
-
-  .product-detail {
-    padding:
-      22px
-      10px
-      80px;
-  }
-
-  .back-link {
-    margin-left: 4px;
-    margin-bottom: 20px;
-  }
-
-  .product-detail-grid {
-    display: block;
-  }
-
-  .product-gallery {
-    width: 100%;
-  }
-
-  .product-main-image img {
-    aspect-ratio: 1 / 1.18;
-  }
-
-  .product-thumbnails button {
-    flex-basis: 62px;
-
-    width: 62px;
-    height: 74px;
-  }
-
-  .product-info {
-    position: static;
-
-    max-width: none;
-
-    padding:
-      34px
-      6px
-      0;
-  }
-
-  .product-detail-category {
-    margin-bottom: 13px;
-
-    font-size: 9px;
-  }
-
-  .product-info h1 {
-    margin-bottom: 16px;
-
-    font-size: clamp(
-      34px,
-      11vw,
-      54px
-    );
-
-    line-height: .9;
-  }
-
-  .detail-price {
-    font-size: 15px;
-  }
-
-  .product-shipping-note {
-    margin-bottom: 28px !important;
-
-    font-size: 11px;
-  }
-
-  .option-block {
-    margin-top: 26px;
-  }
-
-  .size-row,
-  .color-row {
-    gap: 6px;
-  }
-
-  .size-row button,
-  .color-row button {
-    min-width: 48px;
-    min-height: 42px;
-
-    padding:
-      8px
-      13px;
-
-    font-size: 10px;
-  }
-
-  .product-quantity-block {
-    margin-top: 28px;
-  }
-
-  .quantity-control {
-    height: 46px;
-  }
-
-  .quantity-control button {
-    width: 44px;
-    height: 44px;
-  }
-
-  .quantity-control strong {
-    width: 44px;
-  }
-
-  .product-add-cart {
-    min-height: 54px;
-    margin-top: 26px;
-  }
-
-  .product-accordions {
-    margin-top: 34px;
-  }
-
-  .product-accordion > button {
-    min-height: 58px;
-  }
-
-  .product-accordion-content {
-    font-size: 12px;
+  /* Tighten the space before the next row */
+  .shop-page .product-grid.product-grid-new-in {
+    row-gap: 28px !important;
   }
 }
 
@@ -3412,63 +3224,155 @@ a {
    ========================================================= */
 
 @media (max-width: 380px) {
-  .shop-page {
-    padding-left: 7px;
-    padding-right: 7px;
+
+  .shop-page .product-grid-new-in .product-image-wrap {
+    height: 185px !important;
   }
 
-  .shop-page .product-grid {
-    column-gap: 6px;
+  .shop-page .product-grid-new-in .product-image {
+    height: 185px !important;
   }
 
-  .shop-page .product-name {
-    font-size: 9px;
+  .shop-page .product-grid-new-in .product-image img {
+    transform: scale(1.48) !important;
   }
 
-  .shop-page .product-card-price {
-    font-size: 9px;
-  }
-
-  .product-info {
-    padding-left: 3px;
-    padding-right: 3px;
+  .shop-page .product-grid.product-grid-new-in {
+    row-gap: 24px !important;
   }
 }
-
-
 /* =========================================================
-   LARGE DESKTOP
+   PENCILBOY LANDING NEWSLETTER GATE
    ========================================================= */
 
-@media (min-width: 1600px) {
-  .shop-page {
-    padding-left: 38px;
-    padding-right: 38px;
+   .landing-newsletter {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    transform: translateX(-50%);
+    width: min(90%, 500px);
+    text-align: center;
+    color: #fff;
+    z-index: 5;
   }
-
-  .shop-page .product-grid {
-    grid-template-columns:
-      repeat(
-        5,
-        minmax(0, 1fr)
-      );
-
-    column-gap: 22px;
-    row-gap: 58px;
+  
+  .landing-newsletter-eyebrow {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    font-weight: 500;
   }
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .shop-page .product-card img,
-  .product-add-cart,
-  .product-thumbnails button,
-  .size-row button,
-  .color-row button {
-    transition: none;
+  
+  .landing-newsletter h1 {
+    margin: 0 auto 10px;
+    font-size: clamp(22px, 3vw, 34px);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    font-weight: 700;
   }
-}
+  
+  .landing-newsletter p {
+    max-width: 430px;
+    margin: 0 auto 16px;
+    font-size: 10px;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+    color: rgba(255, 255, 255, 0.82);
+  }
+  
+  .landing-newsletter-form {
+    width: min(100%, 360px);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+  }
+  
+  .landing-newsletter-form input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #fff;
+    padding: 9px 0;
+    font-family: inherit;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+  
+  .landing-newsletter-form input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .landing-newsletter-form button {
+    border: 0;
+    background: transparent;
+    color: #fff;
+    padding: 9px 0 9px 14px;
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  
+  .landing-newsletter-form button:hover {
+    opacity: 0.6;
+  }
+  
+  
+  /* =========================================================
+     MOBILE
+     ========================================================= */
+  
+  @media (max-width: 600px) {
+    .landing-newsletter {
+      bottom: 7%;
+      width: calc(100% - 40px);
+    }
+  
+    .landing-newsletter-eyebrow {
+      font-size: 8px;
+      margin-bottom: 8px;
+    }
+  
+    .landing-newsletter h1 {
+      font-size: 22px;
+      margin-bottom: 9px;
+    }
+  
+    .landing-newsletter p {
+      font-size: 9px;
+      max-width: 320px;
+      margin-bottom: 14px;
+    }
+  
+    .landing-newsletter-form {
+      width: min(100%, 330px);
+    }
+  
+    .landing-newsletter-form input {
+      font-size: 9px;
+    }
+  
+    .landing-newsletter-form button {
+      font-size: 8px;
+      padding-left: 10px;
+    }
+  }
+  .landing-newsletter-error {
+    margin-top: 10px;
+    font-size: 9px;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .landing-newsletter-form button:disabled,
+  .landing-newsletter-form input:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }

@@ -377,85 +377,278 @@ function ProductForm({
     setSaving(true);
     setError("");
 
-    const payload = {
-      name: form.name.trim(),
+    try {
+      const productName = String(
+        form.name || ""
+      ).trim();
 
-      slug:
-        form.slug.trim() ||
-        slugify(form.name),
+      if (!productName) {
+        setError("Product name is required.");
+        return;
+      }
 
-      description:
-        form.description.trim() ||
-        null,
+      /*
+       * Slug rules:
+       *
+       * CREATE:
+       *   Omo Ogbon -> omo-ogbon
+       *   Omo Ogbon -> omo-ogbon-2
+       *   Omo Ogbon -> omo-ogbon-3
+       *
+       * EDIT:
+       *   Keep the existing product slug when
+       *   the slug field is left empty.
+       *
+       * MANUAL SLUG:
+       *   If the requested slug already exists,
+       *   automatically add -2, -3, etc.
+       */
 
-      category_id:
-        form.category_id || null,
+      const requestedSlug = String(
+        form.slug || ""
+      ).trim();
 
-      price:
-        Number(form.price) || 0,
+      const existingSlug = String(
+        product?.slug || ""
+      ).trim();
 
-      compare_at_price:
-        form.compare_at_price
-          ? Number(form.compare_at_price)
-          : null,
-
-      images:
-        splitValues(form.images),
-
-      sizes:
-        splitValues(form.sizes),
-
-      colors:
-        splitValues(form.colors),
-
-      stock:
-        Number(form.stock) || 0,
-
-      featured:
-        Boolean(form.featured),
-
-      new_in:
-        Boolean(form.new_in),
-
-      status:
-        form.status,
-
-      sort_order:
-        Number(form.sort_order) || 0,
-
-      updated_at:
-        new Date().toISOString()
-    };
-
-    let result;
-
-    if (product?.id) {
-      result =
-        await supabase
-          .from("products")
-          .update(payload)
-          .eq("id", product.id)
-          .select()
-          .single();
-    } else {
-      result =
-        await supabase
-          .from("products")
-          .insert(payload)
-          .select()
-          .single();
-    }
-
-    if (result.error) {
-      setError(
-        result.error.message
+      let baseSlug = slugify(
+        requestedSlug ||
+          (product?.id && existingSlug
+            ? existingSlug
+            : productName)
       );
-      setSaving(false);
-      return;
-    }
 
-    onSave(result.data);
-    setSaving(false);
+      if (!baseSlug) {
+        baseSlug = slugify(productName);
+      }
+
+      if (!baseSlug) {
+        setError(
+          "A valid product name or slug is required."
+        );
+        return;
+      }
+
+      /*
+       * Find all products using this slug pattern.
+       * We exclude the current product when editing.
+       */
+      const {
+        data: existingProducts,
+        error: slugLookupError
+      } = await supabase
+        .from("products")
+        .select("id, slug")
+        .ilike(
+          "slug",
+          `${baseSlug}%`
+        );
+
+      if (slugLookupError) {
+        throw slugLookupError;
+      }
+
+      const usedSlugs = new Set(
+        (existingProducts || [])
+          .filter(
+            item =>
+              !product?.id ||
+              item.id !== product.id
+          )
+          .map(item =>
+            String(item.slug || "")
+              .trim()
+              .toLowerCase()
+          )
+      );
+
+      /*
+       * Find the first available slug.
+       */
+      let finalSlug = baseSlug;
+      let suffix = 2;
+
+      while (
+        usedSlugs.has(
+          finalSlug.toLowerCase()
+        )
+      ) {
+        finalSlug = `${baseSlug}-${suffix}`;
+        suffix += 1;
+      }
+
+      const payload = {
+        name: productName,
+
+        slug: finalSlug,
+
+        description:
+          String(
+            form.description || ""
+          ).trim() || null,
+
+        category_id:
+          form.category_id || null,
+
+        price:
+          Number(form.price) || 0,
+
+        compare_at_price:
+          form.compare_at_price !==
+            "" &&
+          form.compare_at_price !==
+            null &&
+          form.compare_at_price !==
+            undefined
+            ? Number(
+                form.compare_at_price
+              )
+            : null,
+
+        images:
+          splitValues(form.images),
+
+        sizes:
+          splitValues(form.sizes),
+
+        colors:
+          splitValues(form.colors),
+
+        stock:
+          Number(form.stock) || 0,
+
+        featured:
+          Boolean(form.featured),
+
+        new_in:
+          Boolean(form.new_in),
+
+        status:
+          form.status || "DRAFT",
+
+        sort_order:
+          Number(form.sort_order) || 0,
+
+        updated_at:
+          new Date().toISOString()
+      };
+
+      let result;
+
+      if (product?.id) {
+        result =
+          await supabase
+            .from("products")
+            .update(payload)
+            .eq(
+              "id",
+              product.id
+            )
+            .select()
+            .single();
+      } else {
+        result =
+          await supabase
+            .from("products")
+            .insert(payload)
+            .select()
+            .single();
+      }
+
+      /*
+       * If another product was created with the same
+       * slug between our lookup and save, retry with
+       * the next available suffix instead of freezing.
+       */
+      if (
+        result.error &&
+        result.error.code === "23505" &&
+        result.error.message
+          ?.toLowerCase()
+          .includes("slug")
+      ) {
+        let retrySuffix =
+          suffix;
+
+        let retrySlug =
+          `${baseSlug}-${retrySuffix}`;
+
+        while (true) {
+          const {
+            data: conflictingProduct,
+            error: conflictLookupError
+          } = await supabase
+            .from("products")
+            .select("id")
+            .eq(
+              "slug",
+              retrySlug
+            )
+            .maybeSingle();
+
+          if (conflictLookupError) {
+            throw conflictLookupError;
+          }
+
+          if (!conflictingProduct) {
+            break;
+          }
+
+          retrySuffix += 1;
+
+          retrySlug =
+            `${baseSlug}-${retrySuffix}`;
+        }
+
+        const retryPayload = {
+          ...payload,
+          slug: retrySlug
+        };
+
+        if (product?.id) {
+          result =
+            await supabase
+              .from("products")
+              .update(
+                retryPayload
+              )
+              .eq(
+                "id",
+                product.id
+              )
+              .select()
+              .single();
+        } else {
+          result =
+            await supabase
+              .from("products")
+              .insert(
+                retryPayload
+              )
+              .select()
+              .single();
+        }
+      }
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      onSave(result.data);
+    } catch (error) {
+      console.error(
+        "PENCILBOY product save error:",
+        error
+      );
+
+      setError(
+        error?.message ||
+          "Unable to save product. Please try again."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

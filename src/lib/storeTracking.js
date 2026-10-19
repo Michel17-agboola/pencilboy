@@ -21,14 +21,30 @@ export function getSessionId() {
   }
 
   try {
-    let sessionId = localStorage.getItem(SESSION_KEY);
+    let sessionId =
+      localStorage.getItem(SESSION_KEY);
 
     if (!sessionId) {
       sessionId = createSessionId();
-      localStorage.setItem(SESSION_KEY, sessionId);
+
+      localStorage.setItem(
+        SESSION_KEY,
+        sessionId
+      );
     }
 
     return sessionId;
+  } catch {
+    return null;
+  }
+}
+
+async function getCurrentUserId() {
+  try {
+    const { data } =
+      await supabase.auth.getUser();
+
+    return data?.user?.id || null;
   } catch {
     return null;
   }
@@ -40,29 +56,23 @@ export async function trackEvent(
 ) {
   try {
     const sessionId = getSessionId();
-
-    let userId = null;
-
-    try {
-      const { data } =
-        await supabase.auth.getUser();
-
-      userId = data?.user?.id || null;
-    } catch {
-      userId = null;
-    }
+    const userId =
+      await getCurrentUserId();
 
     const payload = {
       event_type: eventType,
-      product_id: options.productId || null,
+      product_id:
+        options.productId || null,
       session_id: sessionId,
       user_id: userId,
-      metadata: options.metadata || {},
+      metadata:
+        options.metadata || {},
     };
 
-    const { error } = await supabase
-      .from("store_events")
-      .insert(payload);
+    const { error } =
+      await supabase
+        .from("store_events")
+        .insert(payload);
 
     if (error) {
       console.warn(
@@ -91,39 +101,206 @@ export async function trackVisitor() {
 export async function trackProductView(
   productId
 ) {
-  if (!productId) return false;
+  if (!productId) {
+    return false;
+  }
 
-  return trackEvent("PRODUCT_VIEW", {
-    productId,
-  });
+  return trackEvent(
+    "PRODUCT_VIEW",
+    {
+      productId,
+    }
+  );
 }
 
 export async function trackCartAdd(
   productId,
   quantity = 1
 ) {
-  if (!productId) return false;
+  if (!productId) {
+    return false;
+  }
 
-  return trackEvent("CART_ADD", {
-    productId,
-    metadata: {
-      quantity: Number(quantity) || 1,
-    },
-  });
+  return trackEvent(
+    "CART_ADD",
+    {
+      productId,
+      metadata: {
+        quantity:
+          Number(quantity) || 1,
+      },
+    }
+  );
 }
 
-export async function trackLike(productId) {
-  if (!productId) return false;
+/*
+ * -------------------------------------------------------
+ * PERSISTENT PRODUCT LIKES
+ * -------------------------------------------------------
+ *
+ * Likes are stored in Supabase so the Admin Dashboard
+ * can see the real number of active likes.
+ */
 
-  return trackEvent("LIKE", {
-    productId,
-  });
+export async function saveProductLike(
+  productId
+) {
+  if (!productId) {
+    return false;
+  }
+
+  try {
+    const sessionId =
+      getSessionId();
+
+    const userId =
+      await getCurrentUserId();
+
+    const payload = {
+      product_id: productId,
+      session_id: sessionId,
+      user_id: userId,
+    };
+
+    const { error } =
+      await supabase
+        .from("product_likes")
+        .insert(payload);
+
+    /*
+     * If the like already exists because the user
+     * clicked twice or the browser state is out of sync,
+     * don't treat that as a fatal error.
+     */
+    if (
+      error &&
+      !String(
+        error.message || ""
+      ).toLowerCase()
+        .includes("duplicate")
+    ) {
+      console.warn(
+        "PENCILBOY like save:",
+        error.message
+      );
+
+      return false;
+    }
+
+    /*
+     * Also record the activity event.
+     */
+    await trackEvent("LIKE", {
+      productId,
+    });
+
+    return true;
+  } catch (error) {
+    console.warn(
+      "PENCILBOY like save:",
+      error
+    );
+
+    return false;
+  }
 }
 
-export async function trackUnlike(productId) {
-  if (!productId) return false;
+export async function removeProductLike(
+  productId
+) {
+  if (!productId) {
+    return false;
+  }
 
-  return trackEvent("UNLIKE", {
-    productId,
-  });
+  try {
+    const sessionId =
+      getSessionId();
+
+    const userId =
+      await getCurrentUserId();
+
+    let query =
+      supabase
+        .from("product_likes")
+        .delete()
+        .eq(
+          "product_id",
+          productId
+        );
+
+    /*
+     * Logged-in users:
+     * remove their own product like.
+     */
+    if (userId) {
+      query = query.eq(
+        "user_id",
+        userId
+      );
+    } else {
+      /*
+       * Guests:
+       * remove the like belonging to
+       * this browser session.
+       */
+      query = query.eq(
+        "session_id",
+        sessionId
+      );
+    }
+
+    const { error } =
+      await query;
+
+    if (error) {
+      console.warn(
+        "PENCILBOY like removal:",
+        error.message
+      );
+
+      return false;
+    }
+
+    await trackEvent(
+      "UNLIKE",
+      {
+        productId,
+      }
+    );
+
+    return true;
+  } catch (error) {
+    console.warn(
+      "PENCILBOY like removal:",
+      error
+    );
+
+    return false;
+  }
+}
+
+/*
+ * Backwards-compatible tracking helpers.
+ */
+
+export async function trackLike(
+  productId
+) {
+  return trackEvent(
+    "LIKE",
+    {
+      productId,
+    }
+  );
+}
+
+export async function trackUnlike(
+  productId
+) {
+  return trackEvent(
+    "UNLIKE",
+    {
+      productId,
+    }
+  );
 }

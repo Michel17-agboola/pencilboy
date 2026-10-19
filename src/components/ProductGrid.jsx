@@ -41,7 +41,13 @@ export default function ProductGrid({
   }
 
   return (
-    <div className="product-grid">
+    <div
+      className={`product-grid ${
+        isNewIn
+          ? "product-grid-new-in"
+          : "product-grid-category"
+      }`}
+    >
       {products.map((product) => (
         <ProductCard
           key={product.id}
