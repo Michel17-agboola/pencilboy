@@ -3376,3 +3376,497 @@ a {
     opacity: 0.55;
     cursor: default;
   }
+  /* =========================================================
+   PENCILBOY — NEW HEADER + NEWSLETTER POLISH
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. HEADER BACKGROUND — MATCH SHOP BACKGROUND
+   --------------------------------------------------------- */
+
+.store-header {
+  background: #f3f0e8 !important;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.08) !important;
+}
+
+.category-nav {
+  background: #f3f0e8 !important;
+}
+
+
+/* ---------------------------------------------------------
+   2. CATEGORY NAV — SMOOTH HORIZONTAL SCROLL
+   --------------------------------------------------------- */
+
+.category-nav {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
+  display: flex !important;
+  flex-wrap: nowrap !important;
+
+  justify-content: center;
+
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+
+  scrollbar-width: none;
+
+  scroll-behavior: smooth;
+
+  touch-action: pan-x;
+
+  scroll-snap-type: x proximity;
+}
+
+.category-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.category-nav button {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  scroll-snap-align: start;
+}
+
+
+/* ---------------------------------------------------------
+   3. TABLET / MOBILE NAV
+   --------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .category-nav {
+    justify-content: flex-start !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+
+    gap: 28px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .category-nav button {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   4. SMALL PHONE NAV
+   --------------------------------------------------------- */
+
+@media (max-width: 520px) {
+  .category-nav {
+    justify-content: flex-start !important;
+
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+
+    gap: 24px !important;
+
+    height: 62px !important;
+    min-height: 62px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .category-nav button {
+    font-size: 9px !important;
+    flex: 0 0 auto !important;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   5. NEWSLETTER ENTRANCE ANIMATION
+   --------------------------------------------------------- */
+
+.landing-newsletter {
+  animation:
+    pencilboyNewsletterIn
+    900ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+@keyframes pencilboyNewsletterIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 28px);
+    filter: blur(4px);
+  }
+
+  60% {
+    opacity: 0.9;
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    filter: blur(0);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   6. NEWSLETTER CONTENT — SUBTLE STAGGER
+   --------------------------------------------------------- */
+
+.landing-newsletter-eyebrow {
+  animation: pencilboyNewsletterItem 700ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    180ms both;
+}
+
+.landing-newsletter h1 {
+  animation: pencilboyNewsletterItem 700ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    280ms both;
+}
+
+.landing-newsletter p {
+  animation: pencilboyNewsletterItem 700ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    380ms both;
+}
+
+.landing-newsletter-form {
+  animation: pencilboyNewsletterItem 700ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    480ms both;
+}
+
+@keyframes pencilboyNewsletterItem {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   7. NEWSLETTER INPUT INTERACTION
+   --------------------------------------------------------- */
+
+.landing-newsletter-form {
+  transition:
+    border-color 220ms ease,
+    opacity 220ms ease;
+}
+
+.landing-newsletter-form:focus-within {
+  border-color: #fff;
+}
+
+.landing-newsletter-form input {
+  transition: opacity 220ms ease;
+}
+
+.landing-newsletter-form input:focus {
+  opacity: 1;
+}
+
+
+/* ---------------------------------------------------------
+   8. AFTER SUBSCRIBE — CLEAN EXIT
+   --------------------------------------------------------- */
+
+.landing-newsletter {
+  transition:
+    opacity 350ms ease,
+    transform 350ms ease;
+}
+
+
+/* ---------------------------------------------------------
+   9. MOBILE NEWSLETTER ANIMATION
+   --------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .landing-newsletter {
+    animation-duration: 750ms;
+  }
+
+  .landing-newsletter h1 {
+    animation-delay: 220ms;
+  }
+
+  .landing-newsletter p {
+    animation-delay: 300ms;
+  }
+
+  .landing-newsletter-form {
+    animation-delay: 380ms;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   10. REDUCED MOTION
+   --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-newsletter,
+  .landing-newsletter-eyebrow,
+  .landing-newsletter h1,
+  .landing-newsletter p,
+  .landing-newsletter-form {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .category-nav {
+    scroll-behavior: auto !important;
+  }
+}/* =========================================================
+   PENCILBOY — ATTENTION-GRABBING NEWSLETTER ANIMATION
+   ========================================================= */
+
+.landing-newsletter {
+  animation: newsletterAttention 1.4s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+@keyframes newsletterAttention {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 45px) scale(0.96);
+    filter: blur(6px);
+  }
+
+  45% {
+    opacity: 1;
+    transform: translate(-50%, -4px) scale(1.015);
+    filter: blur(0);
+  }
+
+  65% {
+    transform: translate(-50%, 0) scale(1);
+  }
+
+  78% {
+    transform: translate(-50%, -2px) scale(1.008);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   SUBTLE ATTENTION PULSE
+   --------------------------------------------------------- */
+
+.landing-newsletter::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+
+  width: 90px;
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  transform: translateX(-50%);
+  transform-origin: center;
+
+  animation: newsletterLinePulse 2.8s
+    ease-in-out
+    1.2s
+    2;
+}
+
+@keyframes newsletterLinePulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateX(-50%) scaleX(0.55);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   TEXT COMES IN ONE AFTER ANOTHER
+   --------------------------------------------------------- */
+
+.landing-newsletter-eyebrow {
+  animation: newsletterTextIn 650ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    250ms
+    both;
+}
+
+.landing-newsletter h1 {
+  animation: newsletterTextIn 650ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    380ms
+    both;
+}
+
+.landing-newsletter p {
+  animation: newsletterTextIn 650ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    510ms
+    both;
+}
+
+.landing-newsletter-form {
+  animation: newsletterFormIn 800ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    640ms
+    both;
+}
+
+@keyframes newsletterTextIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes newsletterFormIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scaleX(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   EMAIL FIELD — SUBTLE DRAWING EFFECT
+   --------------------------------------------------------- */
+
+.landing-newsletter-form {
+  position: relative;
+  border-bottom-color: rgba(255, 255, 255, 0.35);
+}
+
+.landing-newsletter-form::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+
+  width: 0;
+  height: 1px;
+
+  background: #fff;
+
+  animation: newsletterUnderline 900ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    850ms
+    forwards;
+}
+
+@keyframes newsletterUnderline {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   SUBSCRIBE BUTTON — SMALL ATTENTION MOVEMENT
+   --------------------------------------------------------- */
+
+.landing-newsletter-form button {
+  animation: subscribeButtonAttention 3s
+    ease-in-out
+    2s
+    2;
+}
+
+@keyframes subscribeButtonAttention {
+  0%,
+  70%,
+  100% {
+    transform: translateX(0);
+  }
+
+  75% {
+    transform: translateX(3px);
+  }
+
+  80% {
+    transform: translateX(0);
+  }
+
+  85% {
+    transform: translateX(3px);
+  }
+
+  90% {
+    transform: translateX(0);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .landing-newsletter {
+    animation-duration: 1.15s;
+  }
+
+  .landing-newsletter::after {
+    width: 70px;
+  }
+
+  .landing-newsletter-form button {
+    animation-duration: 3.2s;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   REDUCED MOTION
+   --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-newsletter,
+  .landing-newsletter::after,
+  .landing-newsletter-eyebrow,
+  .landing-newsletter h1,
+  .landing-newsletter p,
+  .landing-newsletter-form,
+  .landing-newsletter-form::after,
+  .landing-newsletter-form button {
+    animation: none !important;
+  }
+}

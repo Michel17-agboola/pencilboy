@@ -6,27 +6,13 @@ export default function ProductGrid({
   onSave,
   saved = [],
   loading = false,
+  isNewIn = false,
 }) {
   if (loading) {
     return (
-      <div
-        className="product-grid product-grid-loading"
-        aria-label="Loading products"
-        aria-busy="true"
-      >
-        {Array.from({ length: 3 }).map((_, index) => (
-          <div
-            className="product-skeleton-card"
-            key={index}
-          >
-            <div className="product-skeleton-image" />
-
-            <div className="product-skeleton-info">
-              <span />
-              <span />
-            </div>
-          </div>
-        ))}
+      <div className="empty-block">
+        <span className="eyebrow">PENCILBOY</span>
+        <p>Loading...</p>
       </div>
     );
   }
@@ -34,7 +20,7 @@ export default function ProductGrid({
   if (!products.length) {
     return (
       <div className="empty-block">
-        <span className="eyebrow">PNCHE</span>
+        <span className="eyebrow">PENCILBOY</span>
         <p>No items available.</p>
       </div>
     );
