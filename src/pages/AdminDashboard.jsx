@@ -1354,4 +1354,17 @@ export default function AdminDashboard() {
       </div>
     </section>
   );
-}
+}supabase
+.channel("admin-product-likes")
+.on(
+  "postgres_changes",
+  {
+    event: "*",
+    schema: "public",
+    table: "product_likes",
+  },
+  () => {
+    loadDashboard(true);
+  }
+)
+.subscribe();
