@@ -18,7 +18,7 @@ const FALLBACK_CATEGORIES = [
 const MENU_ITEMS = [
   ["SHOP", "/shop"],
   ["DROPS", "/drops"],
-  ["LOOKBOOK", "/lookbook"],
+  ["PNCHE STUDIIOS.", "/lookbook"],
   ["WORLD", "/world"],
   ["ABOUT", "/about"],
   ["CONTACT", "/contact"],
@@ -255,11 +255,11 @@ export default function Header({
               onClick={() =>
                 goTo("/")
               }
-              aria-label="PNCHE Studios home"
+              aria-label="PNCHE STUDIIOS home"
             >
               <img
                 src="/pnche.png"
-                alt="PNCHE Studios"
+                alt="PNCHE STUDIIOS"
               />
             </button>
 
@@ -271,6 +271,7 @@ export default function Header({
               }
             >
               <span>CLOSE</span>
+
               <X
                 size={22}
                 strokeWidth={1.5}

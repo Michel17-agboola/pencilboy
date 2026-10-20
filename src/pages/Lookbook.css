@@ -1,0 +1,914 @@
+/* =========================================================
+   PNCHE STUDIO — DIGITAL STYLING SPACE
+   ========================================================= */
+
+.pnche-studio-page {
+  background: #f4f1ea;
+  color: #111;
+  min-height: 100vh;
+  padding-bottom: 100px;
+}
+
+/* =========================================================
+   INTRO
+   ========================================================= */
+
+.pnche-studio-intro {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 90px 5vw 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  border-bottom: 1px solid #111;
+}
+
+.pnche-studio-eyebrow,
+.pnche-studio-intro-note span,
+.pnche-studio-panel-head > div > span,
+.pnche-studio-stage-head,
+.pnche-studio-shop-list > span {
+  display: block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.pnche-studio-intro h1 {
+  margin: 18px 0 20px;
+  font-size: clamp(58px, 9vw, 140px);
+  line-height: .8;
+  letter-spacing: -.08em;
+}
+
+.pnche-studio-intro p {
+  max-width: 560px;
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.pnche-studio-intro-note {
+  display: grid;
+  gap: 10px;
+  text-align: right;
+  flex: 0 0 auto;
+}
+
+.pnche-studio-intro-note span:last-child {
+  font-size: 16px;
+  letter-spacing: .04em;
+}
+
+/* =========================================================
+   MAIN WORKSPACE
+   ========================================================= */
+
+.pnche-studio-workspace {
+  width: min(1500px, 100%);
+  margin: 0 auto;
+  padding: 28px 5vw 0;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr) 250px;
+  gap: 20px;
+  align-items: start;
+}
+
+.pnche-studio-sidebar {
+  min-width: 0;
+}
+
+.pnche-studio-products,
+.pnche-studio-selected {
+  border-top: 1px solid #111;
+}
+
+/* =========================================================
+   PANEL HEADERS
+   ========================================================= */
+
+.pnche-studio-panel-head {
+  min-height: 74px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #cfcac1;
+}
+
+.pnche-studio-panel-head h2 {
+  margin: 6px 0 0;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.pnche-studio-count {
+  min-width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #cfcac1;
+  border-radius: 50%;
+  font-size: 9px;
+  color: #777;
+}
+
+/* =========================================================
+   CATEGORY TABS
+   ========================================================= */
+
+.pnche-studio-tabs {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  padding: 13px 0;
+  scrollbar-width: none;
+}
+
+.pnche-studio-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.pnche-studio-tabs button {
+  flex: 0 0 auto;
+  border: 1px solid #c9c4bb;
+  padding: 7px 8px;
+  background: transparent;
+  color: #111;
+  font-size: 8px;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition:
+    background .18s ease,
+    color .18s ease,
+    border-color .18s ease;
+}
+
+.pnche-studio-tabs button:hover {
+  border-color: #111;
+}
+
+.pnche-studio-tabs button.active {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+/* =========================================================
+   PRODUCT LIST
+   ========================================================= */
+
+.pnche-studio-product-list {
+  display: grid;
+  gap: 8px;
+  max-height: 630px;
+  overflow-y: auto;
+  padding-right: 3px;
+  scrollbar-width: thin;
+}
+
+.pnche-studio-product {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  border: 1px solid transparent;
+  padding: 5px;
+  background: transparent;
+  color: #111;
+  cursor: grab;
+  transition:
+    border-color .18s ease,
+    background .18s ease,
+    transform .18s ease;
+}
+
+.pnche-studio-product:hover {
+  border-color: #cfcac1;
+  background: rgba(255, 255, 255, .45);
+  transform: translateY(-1px);
+}
+
+.pnche-studio-product:active {
+  cursor: grabbing;
+  transform: scale(.99);
+}
+
+.pnche-studio-product-image {
+  height: 78px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .38);
+}
+
+.pnche-studio-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.pnche-studio-product-info {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.pnche-studio-product-info strong {
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.pnche-studio-product-info small {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #777;
+}
+
+.pnche-studio-empty-products {
+  padding: 30px 8px;
+  color: #777;
+}
+
+.pnche-studio-empty-products span {
+  font-size: 9px;
+  letter-spacing: .15em;
+  font-weight: 800;
+}
+
+.pnche-studio-empty-products p {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   CANVAS AREA
+   ========================================================= */
+
+.pnche-studio-stage {
+  min-width: 0;
+}
+
+.pnche-studio-stage-head {
+  height: 74px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #111;
+  border-bottom: 1px solid #cfcac1;
+}
+
+.pnche-studio-canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  min-height: 620px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #d8d3ca;
+  touch-action: none;
+  isolation: isolate;
+}
+
+.pnche-studio-grid {
+  position: absolute;
+  inset: 0;
+  opacity: .22;
+  background-image:
+    linear-gradient(#d9d9d9 1px, transparent 1px),
+    linear-gradient(90deg, #d9d9d9 1px, transparent 1px);
+  background-size: 10% 10%;
+  pointer-events: none;
+}
+
+.pnche-studio-canvas-brand {
+  position: absolute;
+  top: 22px;
+  left: 24px;
+  z-index: 1;
+  display: grid;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.pnche-studio-canvas-brand span {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -.04em;
+}
+
+.pnche-studio-canvas-brand small {
+  font-size: 7px;
+  letter-spacing: .25em;
+}
+
+.pnche-studio-drop-message {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  gap: 8px;
+  width: max-content;
+  max-width: 80%;
+  text-align: center;
+  color: #aaa;
+  pointer-events: none;
+}
+
+.pnche-studio-drop-message span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.pnche-studio-drop-message small {
+  font-size: 10px;
+}
+
+/* =========================================================
+   CANVAS ITEMS
+   ========================================================= */
+
+.pnche-studio-canvas-item {
+  position: absolute;
+  user-select: none;
+  cursor: grab;
+  transform-origin: center center;
+  touch-action: none;
+}
+
+.pnche-studio-canvas-item:active {
+  cursor: grabbing;
+}
+
+.pnche-studio-canvas-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.pnche-studio-canvas-item.selected {
+  outline: 1px dashed #111;
+  outline-offset: 5px;
+}
+
+.pnche-studio-item-tools {
+  position: absolute;
+  left: 50%;
+  bottom: -34px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 3px;
+  padding: 4px;
+  background: #111;
+  color: #fff;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+}
+
+.pnche-studio-item-tools button {
+  width: 25px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.pnche-studio-item-tools button:hover {
+  background: #333;
+}
+
+/* =========================================================
+   CANVAS ACTIONS
+   ========================================================= */
+
+.pnche-studio-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0 0;
+}
+
+.pnche-studio-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition:
+    background .18s ease,
+    color .18s ease,
+    border-color .18s ease,
+    transform .18s ease;
+}
+
+.pnche-studio-actions button:hover {
+  background: #2c2c2c;
+}
+
+.pnche-studio-actions button:active {
+  transform: translateY(1px);
+}
+
+.pnche-studio-actions button.secondary {
+  background: transparent;
+  color: #111;
+  border: 1px solid #bbb5ac;
+}
+
+.pnche-studio-actions button.secondary:hover {
+  border-color: #111;
+  background: #fff;
+}
+
+.pnche-studio-actions button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+.pnche-studio-main-actions {
+  display: flex;
+  gap: 5px;
+}
+
+/* =========================================================
+   SELECTED ITEMS
+   ========================================================= */
+
+.pnche-studio-selected-list {
+  display: grid;
+}
+
+.pnche-studio-selected-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  border-bottom: 1px solid #cfcac1;
+}
+
+.pnche-studio-selected-item > button:first-child {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  padding: 9px 0;
+  background: transparent;
+  color: #111;
+  cursor: pointer;
+}
+
+.pnche-studio-selected-item.active > button:first-child {
+  background: rgba(255, 255, 255, .45);
+}
+
+.pnche-studio-selected-thumb {
+  width: 48px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .4);
+}
+
+.pnche-studio-selected-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.pnche-studio-selected-item strong,
+.pnche-studio-selected-item small {
+  display: block;
+}
+
+.pnche-studio-selected-item strong {
+  overflow: hidden;
+  font-size: 9px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pnche-studio-selected-item small {
+  margin-top: 5px;
+  color: #888;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.pnche-studio-selected-item .remove {
+  padding: 0 8px;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+}
+
+.pnche-studio-selected-item .remove:hover {
+  color: #111;
+}
+
+.pnche-studio-selected-empty {
+  padding: 55px 10px;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+  color: #999;
+}
+
+.pnche-studio-selected-empty p {
+  margin: 0;
+  font-size: 11px;
+}
+
+.pnche-studio-selected-empty span {
+  font-size: 9px;
+}
+
+/* =========================================================
+   LOOK SUMMARY / PRICE
+   ========================================================= */
+
+.pnche-studio-look-summary {
+  margin-top: 25px;
+  padding-top: 18px;
+  border-top: 1px solid #111;
+}
+
+.pnche-studio-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 15px;
+  padding-bottom: 18px;
+}
+
+.pnche-studio-total-row span {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: #777;
+}
+
+.pnche-studio-total-row strong {
+  font-size: 21px;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.pnche-studio-shop-list {
+  padding-top: 2px;
+}
+
+.pnche-studio-shop-list > span {
+  margin-bottom: 2px;
+}
+
+.pnche-studio-shop-list button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid #cfcac1;
+  background: transparent;
+  color: #111;
+  text-align: left;
+  font-size: 9px;
+  cursor: pointer;
+  transition:
+    padding .18s ease,
+    background .18s ease;
+}
+
+.pnche-studio-shop-list button span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pnche-studio-shop-list button span:last-child {
+  flex: 0 0 auto;
+  color: #777;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.pnche-studio-shop-list button:hover {
+  padding-left: 5px;
+  padding-right: 5px;
+  background: rgba(255, 255, 255, .3);
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+.pnche-studio-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 100;
+  transform: translateX(-50%);
+  padding: 12px 17px;
+  background: #111;
+  color: #fff;
+  font-size: 9px;
+  letter-spacing: .08em;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .18);
+  animation: pncheStudioToast .25s ease both;
+}
+
+@keyframes pncheStudioToast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* =========================================================
+   TABLET / SMALL DESKTOP
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  .pnche-studio-workspace {
+    grid-template-columns: 190px minmax(0, 1fr) 205px;
+    gap: 14px;
+  }
+
+  .pnche-studio-product {
+    grid-template-columns: 58px 1fr;
+  }
+
+  .pnche-studio-product-image {
+    height: 64px;
+  }
+
+  .pnche-studio-canvas {
+    min-height: 540px;
+  }
+
+  .pnche-studio-total-row strong {
+    font-size: 18px;
+  }
+}
+
+/* =========================================================
+   TABLET / MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+  .pnche-studio-intro {
+    padding: 65px 20px 45px;
+    display: block;
+  }
+
+  .pnche-studio-intro h1 {
+    font-size: clamp(52px, 15vw, 100px);
+  }
+
+  .pnche-studio-intro-note {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .pnche-studio-workspace {
+    grid-template-columns: 1fr;
+    padding: 18px 20px 0;
+  }
+
+  .pnche-studio-products {
+    order: 2;
+  }
+
+  .pnche-studio-stage {
+    order: 1;
+  }
+
+  .pnche-studio-selected {
+    order: 3;
+  }
+
+  .pnche-studio-product-list {
+    display: flex;
+    overflow-x: auto;
+    max-height: none;
+    padding-bottom: 5px;
+  }
+
+  .pnche-studio-product {
+    flex: 0 0 145px;
+    display: block;
+    padding: 5px;
+  }
+
+  .pnche-studio-product-image {
+    height: 125px;
+  }
+
+  .pnche-studio-product-info {
+    padding: 7px 2px 3px;
+  }
+
+  .pnche-studio-product-info small {
+    display: block;
+    margin-top: 2px;
+  }
+
+  .pnche-studio-selected-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pnche-studio-selected-item {
+    border: 1px solid #cfcac1;
+    margin: 3px;
+  }
+
+  .pnche-studio-look-summary {
+    margin-bottom: 5px;
+  }
+
+  .pnche-studio-canvas {
+    min-height: 0;
+    aspect-ratio: 1 / 1.2;
+  }
+
+  .pnche-studio-total-row strong {
+    font-size: 21px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 520px) {
+  .pnche-studio-page {
+    padding-bottom: 70px;
+  }
+
+  .pnche-studio-intro {
+    padding: 45px 16px 35px;
+  }
+
+  .pnche-studio-intro h1 {
+    font-size: clamp(48px, 16vw, 78px);
+    line-height: .82;
+  }
+
+  .pnche-studio-intro p {
+    font-size: 12px;
+  }
+
+  .pnche-studio-intro-note {
+    gap: 15px;
+  }
+
+  .pnche-studio-intro-note span:last-child {
+    font-size: 12px;
+  }
+
+  .pnche-studio-workspace {
+    padding: 12px 16px 0;
+  }
+
+  .pnche-studio-stage-head {
+    height: 58px;
+  }
+
+  .pnche-studio-canvas {
+    aspect-ratio: 1 / 1.25;
+  }
+
+  .pnche-studio-canvas-brand {
+    top: 15px;
+    left: 16px;
+  }
+
+  .pnche-studio-canvas-brand span {
+    font-size: 12px;
+  }
+
+  .pnche-studio-drop-message span {
+    font-size: 8px;
+  }
+
+  .pnche-studio-drop-message small {
+    font-size: 9px;
+  }
+
+  .pnche-studio-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .pnche-studio-main-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .pnche-studio-actions button {
+    min-height: 42px;
+    font-size: 8px;
+  }
+
+  .pnche-studio-selected-list {
+    grid-template-columns: 1fr;
+  }
+
+  .pnche-studio-total-row {
+    padding-bottom: 15px;
+  }
+
+  .pnche-studio-total-row strong {
+    font-size: 24px;
+  }
+
+  .pnche-studio-toast {
+    width: calc(100% - 32px);
+    text-align: center;
+    bottom: 16px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .pnche-studio-intro h1 {
+    font-size: 44px;
+  }
+
+  .pnche-studio-product {
+    flex-basis: 130px;
+  }
+
+  .pnche-studio-product-image {
+    height: 110px;
+  }
+
+  .pnche-studio-total-row strong {
+    font-size: 21px;
+  }
+/* =========================================================
+   PNCHE STUDIIOS — REMOVE LARGE SECTION DIVIDERS
+   ========================================================= */
+
+/* Remove line under the hero / STYLE YOUR LOOK */
+.pnche-studio-intro {
+  border-bottom: none !important;
+}
+
+/* =========================================================
+   PNCHE STUDIIOS — REMOVE LARGE SECTION DIVIDERS
+   ========================================================= */
+
+/* Remove line under the hero / STYLE YOUR LOOK */
+.pnche-studio-intro {
+  border: none !important;
+  border-bottom: none !important;
+}
+}
+/* Remove line above BUILD / THE CANVAS / YOUR LOOK */
+.pnche-studio-products,
+.pnche-studio-selected,
+.pnche-studio-stage-head {
+  border-top: none !important;
+}
