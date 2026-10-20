@@ -5,8 +5,8 @@ export default function Footer() {
         <div>
           <span className="eyebrow">CONTACT</span>
           <h2>GET IN TOUCH</h2>
-          <a href="mailto:studio@pencilboy.world">STUDIO@PENCILBOY.WORLD</a>
-          <p>+234 · LAGOS, NIGERIA</p>
+          <a href="mailto:pnche9ja@gmail.com  ">pnche9ja@gmail.com  </a>
+          <p>+2348133472550 · LAGOS, NIGERIA</p>
           <p>MON–FRI · 10:00–18:00 WAT</p>
         </div>
 
