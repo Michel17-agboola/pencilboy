@@ -102,18 +102,7 @@ export default function Home({ navigate }) {
         <div className="landing-overlay" />
 
         <div className="landing-copy">
-          <span className="landing-kicker">
-            PNCHE
-          </span>
-
-          <h1>
-            PNCHE.
-          </h1>
-
-          <p>
-            THE CULTURE. THE PIECES. THE WORLD.
-          </p>
-
+        
           <button
             className="landing-enter"
             type="button"

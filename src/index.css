@@ -2487,19 +2487,6 @@ a {
 }
 
 /* Keep the landing copy together so the image remains the main focus. */
-.landing-copy {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: min(92vw, 1200px);
-  margin: 0;
-  padding: 0 20px;
-  text-align: center;
-  animation: pencilboyLandingIn 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
 
 .landing-kicker {
   margin: 0 0 24px;
@@ -2511,27 +2498,6 @@ a {
   letter-spacing: 0.28em;
   text-transform: uppercase;
 }
-
-.landing-copy h1 {
-  margin: 0;
-  color: #fff;
-  font-size: clamp(72px, 10.8vw, 175px);
-  font-weight: 900;
-  line-height: 0.80;
-  letter-spacing: -0.075em;
-}
-
-.landing-copy p {
-  margin: 30px 0 48px;
-  color: rgba(255, 255, 255, 0.92);
-  font-family: "Courier New", monospace;
-  font-size: clamp(9px, 0.75vw, 12px);
-  font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-}
-
 .landing-enter {
   display: inline-flex;
   align-items: center;
@@ -2581,17 +2547,6 @@ a {
     transform: translateY(0);
   }
 }
-
-@media (max-width: 900px) {
-  .landing-copy {
-    width: 94vw;
-  }
-
-  .landing-copy h1 {
-    font-size: clamp(58px, 15vw, 110px);
-  }
-}
-
 @media (max-width: 600px) {
   .landing-hero::before {
     inset: -4%;
@@ -2599,28 +2554,11 @@ a {
     animation-duration: 24s;
   }
 
-  .landing-copy {
-    padding: 0 14px;
-  }
-
   .landing-kicker {
     margin-bottom: 18px;
     font-size: 8px;
     letter-spacing: 0.20em;
   }
-
-  .landing-copy h1 {
-    font-size: clamp(50px, 17vw, 90px);
-    line-height: 0.82;
-  }
-
-  .landing-copy p {
-    margin: 24px 0 38px;
-    max-width: 240px;
-    font-size: 8px;
-    letter-spacing: 0.20em;
-  }
-
   .landing-enter {
     font-size: 9px;
     letter-spacing: 0.20em;
@@ -2629,10 +2567,6 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .landing-hero::before,
-  .landing-copy {
-    animation: none;
-  }
-
   .landing-enter,
   .landing-enter span {
     transition: none;
