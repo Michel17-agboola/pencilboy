@@ -1,4 +1,5 @@
 export default function Footer() {
+  const year = new Date().getFullYear();
   return (
     <footer className="site-footer">
       <div className="footer-top">
@@ -53,7 +54,7 @@ export default function Footer() {
           <a href="#/account">ORDER STATUS</a>
         </nav>
 
-        <span>© 2026 PENCILBOY</span>
+        <span>© {year} PENCILBOY</span>
       </div>
     </footer>
   );

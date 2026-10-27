@@ -9,6 +9,7 @@ import {
 import { toPng } from "html-to-image";
 import { supabase } from "../lib/supabase";
 import "./Lookbook.css";
+import { formatNaira } from "../lib/format";
 
 /* =========================================================
    HELPERS
@@ -20,9 +21,6 @@ function makeId() {
     .slice(2, 9)}`;
 }
 
-function formatNaira(value) {
-  return `₦${Number(value || 0).toLocaleString("en-NG")}`;
-}
 
 function getImage(product) {
   const images = product?.images;

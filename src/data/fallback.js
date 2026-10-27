@@ -1,3 +1,16 @@
+export const FALLBACK_CATEGORIES = [
+  { id: "new-in", name: "NEW IN", slug: "new-in" },
+  { id: "tops", name: "TOPS", slug: "tops" },
+  { id: "bottoms", name: "BOTTOMS", slug: "bottoms" },
+  { id: "headgear", name: "HEADGEAR", slug: "headgear" },
+  { id: "hoodies", name: "HOODIES & SWEATS", slug: "hoodies-sweats" },
+  { id: "jackets", name: "JACKETS", slug: "jackets" },
+  { id: "footwear", name: "FOOTWEAR", slug: "footwear" },
+  { id: "accessories", name: "ACCESSORIES", slug: "accessories" },
+  { id: "collectibles", name: "COLLECTIBLES", slug: "collectibles" },
+  { id: "bags", name: "BAGS", slug: "bags" },
+];
+
 export const FALLBACK_PRODUCTS = [
   {
     id: "demo-1",

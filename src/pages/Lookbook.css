@@ -887,25 +887,16 @@
   .pnche-studio-total-row strong {
     font-size: 21px;
   }
-/* =========================================================
-   PNCHE STUDIIOS — REMOVE LARGE SECTION DIVIDERS
-   ========================================================= */
-
-/* Remove line under the hero / STYLE YOUR LOOK */
-.pnche-studio-intro {
-  border-bottom: none !important;
 }
 
 /* =========================================================
-   PNCHE STUDIIOS — REMOVE LARGE SECTION DIVIDERS
+   PNCHE STUDIIOS — SECTION DIVIDERS
    ========================================================= */
 
-/* Remove line under the hero / STYLE YOUR LOOK */
 .pnche-studio-intro {
   border: none !important;
-  border-bottom: none !important;
 }
-}
+
 /* Remove line above BUILD / THE CANVAS / YOUR LOOK */
 .pnche-studio-products,
 .pnche-studio-selected,

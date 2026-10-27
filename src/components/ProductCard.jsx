@@ -1,3 +1,4 @@
+import { formatNaira } from "../lib/format";
 export default function ProductCard({
   product,
   onOpen,
@@ -12,8 +13,9 @@ export default function ProductCard({
 
   const price =
     product.price !== undefined &&
-    product.price !== null
-      ? `₦${Number(product.price).toLocaleString("en-NG")}`
+    product.price !== null &&
+    product.price !== ""
+      ? formatNaira(product.price)
       : "";
 
   return (
@@ -54,6 +56,7 @@ export default function ProductCard({
         )}
       </div>
 
+      {/* PRODUCT CARD INFORMATION */}
       <div className="product-card-info">
         <button
           type="button"

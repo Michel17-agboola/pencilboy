@@ -2,18 +2,9 @@ import { ShoppingBag, X, Plus, ArrowUpRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import BrandLogo from "./BrandLogo";
 
-const FALLBACK_CATEGORIES = [
-  { id: "new-in", name: "NEW IN", slug: "new-in" },
-  { id: "tops", name: "TOPS", slug: "tops" },
-  { id: "bottoms", name: "BOTTOMS", slug: "bottoms" },
-  { id: "headgear", name: "HEADGEAR", slug: "headgear" },
-  { id: "hoodies", name: "HOODIES & SWEATS", slug: "hoodies-sweats" },
-  { id: "jackets", name: "JACKETS", slug: "jackets" },
-  { id: "footwear", name: "FOOTWEAR", slug: "footwear" },
-  { id: "accessories", name: "ACCESSORIES", slug: "accessories" },
-  { id: "collectibles", name: "COLLECTIBLES", slug: "collectibles" },
-  { id: "bags", name: "BAGS", slug: "bags" },
-];
+import { FALLBACK_CATEGORIES } from "../data/fallback";
+import { slugify } from "../lib/format";
+
 
 const MENU_ITEMS = [
   ["SHOP", "/shop"],
@@ -68,10 +59,7 @@ export default function Header({
         category.slug || ""
       ).trim();
 
-      const normalized = name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
+      const normalized = slugify(name);
 
       const isNewIn =
         normalized === "new-in" ||
@@ -174,7 +162,7 @@ export default function Header({
         <button
           type="button"
           className="store-bag"
-          onClick={() => goTo("/cart")}
+          onClick={() => goTo("/bag")}
           aria-label="Cart"
         >
           <ShoppingBag

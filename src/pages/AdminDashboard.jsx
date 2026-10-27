@@ -15,6 +15,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { formatNaira, formatNumber, formatDate, formatShortDate } from "../lib/format";
 
 const EXCLUDED_STATUSES = [
   "CANCELLED",
@@ -30,38 +31,6 @@ const RANGE_OPTIONS = [
   { key: "12m", label: "12 Months" },
 ];
 
-function formatNaira(value) {
-  return new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    maximumFractionDigits: 0,
-  }).format(Number(value) || 0);
-}
-
-function formatNumber(value) {
-  return new Intl.NumberFormat("en-NG").format(
-    Number(value) || 0
-  );
-}
-
-function formatDate(value) {
-  if (!value) return "—";
-
-  return new Intl.DateTimeFormat("en-NG", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
-function formatShortDate(value) {
-  if (!value) return "";
-
-  return new Intl.DateTimeFormat("en-NG", {
-    day: "2-digit",
-    month: "short",
-  }).format(new Date(value));
-}
 
 function getStartDate(range) {
   const now = new Date();

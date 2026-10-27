@@ -13,17 +13,24 @@ export default function SignIn({ navigate }) {
     setLoading(true);
     setError("");
 
-    const result = signup
-      ? await supabase.auth.signUp({ email, password })
-      : await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const result = signup
+        ? await supabase.auth.signUp({ email, password })
+        : await supabase.auth.signInWithPassword({ email, password });
 
-    if (result.error) {
-      setError(result.error.message);
-    } else {
-      navigate("/account");
+      if (result.error) {
+        setError(result.error.message);
+      } else {
+        navigate("/account");
+      }
+    } catch (submitError) {
+      setError(
+        submitError?.message ||
+          "Unable to complete the request. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (

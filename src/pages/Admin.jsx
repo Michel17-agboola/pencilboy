@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Plus, Search, Package, Tags, LogOut, Pencil, Trash2, X, Save, ArrowLeft, RefreshCw, Activity } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import AdminDashboard from "./AdminDashboard";
+import { formatNaira, slugify } from "../lib/format";
 import "../admin.css";
 
 const EMPTY_PRODUCT = {
@@ -30,13 +31,6 @@ const EMPTY_CATEGORY = {
   status: "PUBLISHED"
 };
 
-const slugify = value =>
-  String(value || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-
 function splitValues(value) {
   return String(value || "")
     .split(",")
@@ -44,9 +38,6 @@ function splitValues(value) {
     .filter(Boolean);
 }
 
-function formatNaira(value) {
-  return `₦${Number(value || 0).toLocaleString("en-NG")}`;
-}
 
 function AdminLogin({ onLoggedIn }) {
   const [email, setEmail] = useState("");

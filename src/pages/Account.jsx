@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import PageIntro from "../components/PageIntro";
 import { supabase } from "../lib/supabase";
 
-const money = (n) => `₦${Number(n || 0).toLocaleString("en-NG")}`;
 
+import { formatNaira } from "../lib/format";
 export default function Account({ user, navigate, onSignOut }) {
   const [orders, setOrders] = useState([]);
 
@@ -55,7 +55,7 @@ export default function Account({ user, navigate, onSignOut }) {
                 <strong>{order.order_number || `PB-${String(order.id).slice(0, 6).toUpperCase()}`}</strong>
                 <p>{new Date(order.created_at).toLocaleDateString("en-GB")} · {order.item_count || 1} ITEM(S)</p>
               </div>
-              <span>{(order.status || "PROCESSING").toUpperCase()} <b>{money(order.total)}</b></span>
+              <span>{(order.status || "PROCESSING").toUpperCase()} <b>{formatNaira(order.total)}</b></span>
             </article>
           )) : (
             <div className="empty-block">

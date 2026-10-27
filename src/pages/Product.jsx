@@ -1,16 +1,11 @@
-import {
-  ArrowLeft,
+import { ArrowLeft,
   Minus,
   Plus,
   ChevronDown,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { trackProductView } from "../lib/storeTracking";
-
-const money = (n) =>
-  `₦${Number(
-    n || 0
-  ).toLocaleString("en-NG")}`;
+import { formatNaira } from "../lib/format";
 
 const getImages = (product) => {
   if (
@@ -170,7 +165,7 @@ export default function Product({
 
           <div className="product-price-row">
             <strong className="detail-price">
-              {money(product?.price)}
+              {formatNaira(product?.price)}
             </strong>
 
             {product?.compare_at_price &&
@@ -181,7 +176,7 @@ export default function Product({
                   product.price
                 ) && (
                 <span className="compare-price">
-                  {money(
+                  {formatNaira(
                     product.compare_at_price
                   )}
                 </span>

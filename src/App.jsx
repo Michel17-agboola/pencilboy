@@ -28,37 +28,13 @@ import {
   FALLBACK_DROPS,
   FALLBACK_STORIES,
   FALLBACK_LOOKBOOK,
+  FALLBACK_CATEGORIES,
 } from "./data/fallback";
+import { slugify } from "./lib/format";
+import { fetchStoreCatalogue } from "./lib/catalogue";
+import { setPageMeta } from "./lib/seo";
+import NotFound from "./pages/NotFound";
 
-const FALLBACK_CATEGORIES = [
-  { id: "new-in", name: "NEW IN", slug: "new-in" },
-  { id: "tees", name: "TEES", slug: "tees" },
-  { id: "shorts", name: "SHORTS", slug: "shorts" },
-  {
-    id: "hoodies",
-    name: "HOODIES & SWEATERS",
-    slug: "hoodies",
-  },
-  { id: "pants", name: "PANTS", slug: "pants" },
-  { id: "jackets", name: "JACKETS", slug: "jackets" },
-  {
-    id: "knitwear",
-    name: "KNITWEAR",
-    slug: "knitwear",
-  },
-  {
-    id: "accessories",
-    name: "ACCESSORIES",
-    slug: "accessories",
-  },
-];
-
-const slugify = (value) =>
-  String(value || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
 
 function readStorage(key, fallback = []) {
   try {
@@ -113,6 +89,35 @@ export default function App() {
 
   const baseRoute = route.split("?")[0];
 
+  useEffect(() => {
+    const titles = {
+      "/": "PENCILBOY — PNCHE STUDIIOS.",
+      "/shop": "SHOP — PENCILBOY",
+      "/drops": "DROPS — PENCILBOY",
+      "/lookbook": "PNCHE STUDIIOS. — PENCILBOY",
+      "/world": "WORLD — PENCILBOY",
+      "/about": "ABOUT — PENCILBOY",
+      "/contact": "CONTACT — PENCILBOY",
+      "/search": "SEARCH — PENCILBOY",
+      "/bag": "BAG — PENCILBOY",
+      "/checkout": "CHECKOUT — PENCILBOY",
+      "/account": "ACCOUNT — PENCILBOY",
+      "/signin": "SIGN IN — PENCILBOY",
+      "/admin": "ADMIN — PENCILBOY",
+      "/terms": "TERMS — PENCILBOY",
+      "/privacy": "PRIVACY — PENCILBOY",
+      "/returns": "RETURNS — PENCILBOY",
+    };
+
+    const title =
+      titles[baseRoute] ||
+      (baseRoute.startsWith("/product/")
+        ? "PRODUCT — PENCILBOY"
+        : "PAGE NOT FOUND — PENCILBOY");
+
+    setPageMeta(title);
+  }, [baseRoute]);
+
   const [products, setProducts] = useState(
     FALLBACK_PRODUCTS
   );
@@ -155,7 +160,7 @@ export default function App() {
     }
 
     trackVisitor();
-  }, []);
+  }, [baseRoute]);
 
   /*
    * -------------------------------------------------------
@@ -206,44 +211,14 @@ export default function App() {
           );
         }
 
-        const [p, c] = await Promise.all([
-          supabase
-            .from("products")
-            .select("*")
-            .eq("status", "PUBLISHED")
-            .order("sort_order", {
-              ascending: true,
-            }),
+        const catalogue = await fetchStoreCatalogue();
 
-          supabase
-            .from("categories")
-            .select("*")
-            .eq("status", "PUBLISHED")
-            .order("sort_order", {
-              ascending: true,
-            }),
-        ]);
-
-        if (p.data?.length) {
-          setProducts(p.data);
+        if (catalogue.products.length) {
+          setProducts(catalogue.products);
         }
 
-        if (c.data?.length) {
-          setCategories(c.data);
-        }
-
-        if (p.error) {
-          console.warn(
-            "PENCILBOY products query:",
-            p.error.message
-          );
-        }
-
-        if (c.error) {
-          console.warn(
-            "PENCILBOY categories query:",
-            c.error.message
-          );
+        if (catalogue.categories.length) {
+          setCategories(catalogue.categories);
         }
 
         const authListener =
@@ -696,11 +671,7 @@ export default function App() {
           </section>
         );
       } else {
-        page = (
-          <Home
-            navigate={navigate}
-          />
-        );
+        page = <NotFound navigate={navigate} />;
       }
 
       break;

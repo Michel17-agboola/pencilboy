@@ -19,6 +19,14 @@
 
 * { box-sizing: border-box; }
 
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+
 html { scroll-behavior: smooth; }
 
 body {
@@ -1970,10 +1978,7 @@ a {
 .store-menu { left: 12px; }
 .store-bag { right: 12px; }
 
-.store-menu:hover,
-.store-bag:hover {
-  transform: scale(1.08);
-}
+
 
 .store-menu.is-open {
   transform: rotate(90deg);
@@ -2010,9 +2015,7 @@ a {
   scrollbar-width: none;
 }
 
-.category-nav::-webkit-scrollbar {
-  display: none;
-}
+
 
 .category-nav button {
   position: relative;
@@ -2819,67 +2822,7 @@ a {
     }
   }
   /* =========================================================
-   PENCILBOY — CLEAN PRODUCT CATALOGUE IMAGES
-   ========================================================= */
-
-.product-grid {
-  background: #f4f1e9;
-}
-
-.product-card {
-  background: transparent !important;
-}
-
-.product-card-image,
-.product-card-media,
-.product-image-wrap {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Remove the white image/card treatment */
-.product-card img {
-  background: transparent !important;
-  mix-blend-mode: multiply;
-}
-
-/* Make the actual clothing larger */
-.product-card-image img,
-.product-card-media img,
-.product-image-wrap img,
-.product-card > img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-}
-
-/* Give the product more visual presence */
-.product-card-image,
-.product-card-media,
-.product-image-wrap {
-  min-height: 320px;
-}
-
-/* Mobile */
-@media (max-width: 520px) {
-  .product-card-image,
-  .product-card-media,
-  .product-image-wrap {
-    min-height: 260px;
-  }
-}
-
-/* Tablet */
-@media (min-width: 521px) and (max-width: 900px) {
-  .product-card-image,
-  .product-card-media,
-  .product-image-wrap {
-    min-height: 340px;
-  }
-}/* =========================================================
-   PENCILBOY — REMOVE PRODUCT IMAGE BOX
+   PRODUCT CATALOGUE — CANONICAL CARD SYSTEM
    ========================================================= */
 
 .shop-page {
@@ -2890,357 +2833,232 @@ a {
   background: transparent !important;
 }
 
+.shop-page .product-image-wrap {
+  min-height: 320px;
+  background: transparent !important;
+}
+
 .shop-page .product-image {
-  background: #f4f1e9 !important;
-  border: none !important;
+  width: 100% !important;
+  height: 330px !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+  display: block !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  border: 0 !important;
   box-shadow: none !important;
-  overflow: hidden;
 }
 
 .shop-page .product-image img {
   width: 100% !important;
   height: 100% !important;
   object-fit: contain !important;
-
-  /*
-   * Makes white backgrounds in the product photos
-   * blend into the catalogue background.
-   */
+  object-position: center !important;
+  transform: scale(1.38) !important;
+  transform-origin: center !important;
   mix-blend-mode: multiply !important;
 }
 
-/* Make the clothing visually larger */
-@media (max-width: 520px) {
-  .shop-page .product-image {
-    aspect-ratio: 1 / 1 !important;
-  }
-
-  .shop-page .product-image img {
-    transform: scale(1.12);
-  }
-}
-
-@media (min-width: 521px) {
-  .shop-page .product-image img {
-    transform: scale(1.08);
-  }
-}
-/* =========================================================
-   PENCILBOY — FINAL PRODUCT MOCKUP SIZE
-   ========================================================= */
-
-   .shop-page .product-image {
-    width: 100% !important;
-    aspect-ratio: 1 / 1 !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    overflow: hidden !important;
-    display: block !important;
-  }
-  
-  .shop-page .product-image img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    object-position: center !important;
-  
-    /* BIGGER CLOTHING */
-    transform: scale(1.65) !important;
-    transform-origin: center center !important;
-  
-    mix-blend-mode: multiply !important;
-  }
-  
-  /* NEW IN — keep the 3-column layout */
-  @media (max-width: 520px) {
-    .shop-page .product-grid.product-grid-new-in {
-      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      column-gap: 7px !important;
-    }
-  
-    .shop-page .product-image img {
-      transform: scale(1.65) !important;
-    }
-  }
-  
-  /* CATEGORY PAGES — one large product */
-  @media (max-width: 520px) {
-    .shop-page .product-grid.product-grid-category {
-      grid-template-columns: 1fr !important;
-    }
-  
-    .shop-page .product-grid.product-grid-category .product-image img {
-      transform: scale(1.65) !important;
-    }
-  }
-  /* =========================================================
-   PENCILBOY — PRODUCT NAME & PRICE POLISH
-   ========================================================= */
-
-.shop-page .product-card-info {
-  width: 100%;
+.shop-page .product-card-info,
+.product-grid .product-card-info {
+  width: 100% !important;
   display: flex !important;
-  align-items: baseline !important;
-  justify-content: space-between !important;
-  gap: 16px !important;
-  padding: 14px 0 0 !important;
-  text-align: left;
-}
-
-.shop-page .product-name {
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
   margin: 0 !important;
-  font-size: 14px !important;
-  line-height: 1.2 !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.01em !important;
-  text-align: left !important;
+  padding: 14px 8px 0 !important;
+  text-align: center !important;
 }
 
-.shop-page .product-card-price {
+.shop-page .product-card .product-name,
+.product-grid .product-card .product-name {
+  width: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
+  text-align: center !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  transform: none !important;
+}
+
+.shop-page .product-card .product-card-price,
+.product-grid .product-card .product-card-price {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
   font-size: 13px !important;
   line-height: 1.2 !important;
-  font-weight: 400 !important;
-  letter-spacing: 0 !important;
-  color: #555 !important;
+  font-weight: 700 !important;
+  color: #111 !important;
   white-space: nowrap !important;
-  text-align: right !important;
 }
 
-/* Category pages — keep name and price clean underneath */
-@media (max-width: 520px) {
-  .shop-page .product-card-info {
-    display: flex !important;
-    align-items: baseline !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    padding-top: 14px !important;
-  }
-
-  .shop-page .product-name {
-    font-size: 14px !important;
-  }
-
-  .shop-page .product-card-price {
-    font-size: 12px !important;
-  }
-
-  /* For NEW IN, keep the compact 3-column look */
-  .shop-page .product-grid-new-in .product-card-info {
-    display: block !important;
-    text-align: center !important;
-  }
-
-  .shop-page .product-grid-new-in .product-name {
-    text-align: center !important;
-    font-size: 10px !important;
-  }
-
-  .shop-page .product-grid-new-in .product-card-price {
-    margin-top: 6px !important;
-    text-align: center !important;
-    font-size: 10px !important;
-  }
-}/* =========================================================
-   PENCILBOY — NEW IN PRODUCT CARD FINAL SPACING
-   ========================================================= */
-
-@media (max-width: 520px) {
-
-  /* Make the product image area shorter */
-  .shop-page .product-grid-new-in .product-image {
-    aspect-ratio: 1 / 0.72 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    background: transparent !important;
-    overflow: hidden !important;
-  }
-
-  /* Make the actual clothing mockup MUCH bigger */
-  .shop-page .product-grid-new-in .product-image img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    transform: scale(1.9) !important;
-    transform-origin: center center !important;
-    mix-blend-mode: multiply !important;
-  }
-
-  /* Bring name and price much closer to the mockup */
-  .shop-page .product-grid-new-in .product-card-info {
-    margin-top: 0 !important;
-    padding: 4px 0 22px !important;
-    display: block !important;
-    text-align: center !important;
-  }
-
-  .shop-page .product-grid-new-in .product-name {
-    margin: 0 !important;
-    font-size: 13px !important;
-    line-height: 1.2 !important;
-    text-align: center !important;
-  }
-
-  .shop-page .product-grid-new-in .product-card-price {
-    margin: 5px 0 0 !important;
-    font-size: 12px !important;
-    line-height: 1.2 !important;
-    text-align: center !important;
-  }
+/* Product cards never display the compare-at price. */
+.product-card .compare-price,
+.product-card .compare-at-price,
+.product-card del,
+.product-card s {
+  display: none !important;
 }
-/* =========================================================
-   PENCILBOY — NEW IN ONLY
-   BIGGER MOCKUPS + TIGHTER PRODUCT INFO
-   ========================================================= */
 
-/* NEW IN ONLY — desktop */
+/* New-in catalogue layout. */
 .shop-page .product-grid-new-in .product-image-wrap {
   min-height: 0 !important;
 }
 
 .shop-page .product-grid-new-in .product-image {
-  min-height: 0 !important;
   height: 330px !important;
-  aspect-ratio: auto !important;
 }
 
-.shop-page .product-grid-new-in .product-image img {
-  transform: scale(1.38) !important;
-  transform-origin: center center !important;
-}
-
-/* Keep product information close to the mockup */
-.shop-page .product-grid-new-in .product-card-info {
-  margin-top: 10px !important;
-  gap: 8px !important;
-}
-
-.shop-page .product-grid-new-in .product-name {
-  margin-top: 0 !important;
-}
-
-.shop-page .product-grid-new-in .product-card-price {
-  margin-top: 4px !important;
-}
-
-
-/* =========================================================
-   TABLET
-   ========================================================= */
-
-@media (min-width: 521px) and (max-width: 900px) {
-
-  .shop-page .product-grid-new-in .product-image-wrap {
-    min-height: 0 !important;
-  }
-
-  .shop-page .product-grid-new-in .product-image {
-    height: 270px !important;
-    min-height: 0 !important;
-    aspect-ratio: auto !important;
-  }
-
-  .shop-page .product-grid-new-in .product-image img {
-    transform: scale(1.45) !important;
-    transform-origin: center center !important;
-  }
-
-  .shop-page .product-grid-new-in .product-card-info {
-    margin-top: 10px !important;
-    gap: 8px !important;
-  }
-
-  .shop-page .product-grid-new-in .product-name {
-    margin-top: 0 !important;
-  }
-
-  .shop-page .product-grid-new-in .product-card-price {
-    margin-top: 4px !important;
-  }
-}
-
-
-/* =========================================================
-   MOBILE — THIS IS THE IMPORTANT ONE FOR YOUR iPHONE
-   ========================================================= */
-
+/* Category pages keep one large product per row on phones. */
 @media (max-width: 520px) {
-
-  /* Remove the huge invisible image space */
-  .shop-page .product-grid-new-in .product-image-wrap {
-    min-height: 0 !important;
-    height: 205px !important;
-  }
-
-  /* Make the image area shorter and tighter */
-  .shop-page .product-grid-new-in .product-image {
-    width: 100% !important;
-    height: 205px !important;
-    min-height: 0 !important;
-    aspect-ratio: auto !important;
-    overflow: hidden !important;
-  }
-
-  /* BIGGER CLOTHING MOCKUP */
-  .shop-page .product-grid-new-in .product-image img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    transform: scale(1.55) !important;
-    transform-origin: center center !important;
-  }
-
-  /* Bring name immediately under the mockup */
-  .shop-page .product-grid-new-in .product-card-info {
-    margin-top: 8px !important;
-    gap: 0 !important;
-    display: block !important;
-  }
-
-  .shop-page .product-grid-new-in .product-name {
-    margin-top: 0 !important;
-    font-size: 11px !important;
-    line-height: 1.2 !important;
-  }
-
-  /* Price directly underneath */
-  .shop-page .product-grid-new-in .product-card-price {
-    margin-top: 4px !important;
-    font-size: 10px !important;
-    line-height: 1.2 !important;
-  }
-
-  /* Tighten the space before the next row */
   .shop-page .product-grid.product-grid-new-in {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    column-gap: 7px !important;
     row-gap: 28px !important;
   }
-}
 
+  .shop-page .product-grid.product-grid-category {
+    grid-template-columns: 1fr !important;
+    column-gap: 0 !important;
+    row-gap: 48px !important;
+  }
 
-/* =========================================================
-   VERY SMALL PHONES
-   ========================================================= */
+  .shop-page .product-image-wrap {
+    min-height: 0 !important;
+  }
 
-@media (max-width: 380px) {
+  .shop-page .product-image {
+    height: 205px !important;
+  }
 
-  .shop-page .product-grid-new-in .product-image-wrap {
-    height: 185px !important;
+  .shop-page .product-image img {
+    transform: scale(1.55) !important;
   }
 
   .shop-page .product-grid-new-in .product-image {
+    height: 205px !important;
+  }
+
+  .shop-page .product-grid-new-in .product-card-info {
+    gap: 5px !important;
+    padding: 10px 5px 0 !important;
+  }
+
+  .shop-page .product-card .product-name,
+  .product-grid .product-card .product-name {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+  }
+
+  .shop-page .product-card .product-card-price,
+  .product-grid .product-card .product-card-price {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+  }
+}
+
+@media (min-width: 521px) and (max-width: 900px) {
+  .shop-page .product-image {
+    height: 270px !important;
+  }
+
+  .shop-page .product-image img {
+    transform: scale(1.45) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .shop-page .product-grid.product-grid-new-in {
+    column-gap: 5px !important;
+    row-gap: 24px !important;
+  }
+
+  .shop-page .product-grid.product-grid-category {
+    row-gap: 42px !important;
+  }
+
+  .shop-page .product-image {
     height: 185px !important;
   }
 
-  .shop-page .product-grid-new-in .product-image img {
+  .shop-page .product-image img {
     transform: scale(1.48) !important;
   }
 
-  .shop-page .product-grid.product-grid-new-in {
-    row-gap: 24px !important;
+  .shop-page .product-card .product-name,
+  .product-grid .product-card .product-name {
+    font-size: 11px !important;
+  }
+
+  .shop-page .product-card .product-card-price,
+  .product-grid .product-card .product-card-price {
+    font-size: 10px !important;
   }
 }
+
+/* =========================================================
+   PRODUCT DETAIL — PRICE SYSTEM
+   ========================================================= */
+
+.product-price-row {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 18px !important;
+  flex-wrap: wrap !important;
+}
+
+.product-info .detail-price {
+  display: inline-block !important;
+  margin: 0 0 30px !important;
+  font-size: 17px !important;
+  line-height: 1.2 !important;
+  font-weight: 800 !important;
+  color: #111 !important;
+}
+
+.product-info .compare-price {
+  display: inline-block !important;
+  margin: 0 0 30px !important;
+  font-size: 15px !important;
+  line-height: 1.2 !important;
+  font-weight: 400 !important;
+  color: #555 !important;
+  text-decoration: line-through !important;
+  text-decoration-thickness: 1px !important;
+  text-decoration-color: #555 !important;
+}
+
+/* =========================================================
+   FOOTER — MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .footer-bottom {
+    padding-top: 28px !important;
+    padding-bottom: 28px !important;
+    gap: 20px !important;
+    text-align: center !important;
+  }
+
+  .footer-bottom-links {
+    gap: 15px 22px !important;
+  }
+
+  .footer-bottom-links a,
+  .footer-bottom > span {
+    font-size: 10px !important;
+  }
+}
+
 /* =========================================================
    PENCILBOY LANDING NEWSLETTER GATE
    ========================================================= */
@@ -3419,9 +3237,7 @@ a {
   scroll-snap-type: x proximity;
 }
 
-.category-nav::-webkit-scrollbar {
-  display: none;
-}
+
 
 .category-nav button {
   flex: 0 0 auto !important;
@@ -4178,77 +3994,6 @@ a {
     animation: none;
   }
 }
-/* =========================================================
-   PENCILBOY — FINAL CENTER ALIGNMENT SYSTEM
-   ========================================================= */
-
-/* ---------------------------------------------------------
-   PRODUCT CARDS
-   Name + price ALWAYS stay centered together.
-   --------------------------------------------------------- */
-
-.shop-page .product-card-info,
-.product-grid .product-card-info {
-  width: 100% !important;
-
-  display: flex !important;
-  flex-direction: column !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  gap: 6px !important;
-
-  margin: 0 !important;
-  padding: 14px 8px 0 !important;
-
-  text-align: center !important;
-}
-
-.shop-page .product-card .product-name,
-.product-grid .product-card .product-name {
-  width: 100% !important;
-
-  display: block !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  text-align: center !important;
-
-  font-size: 14px !important;
-  line-height: 1.2 !important;
-  font-weight: 500 !important;
-
-  white-space: normal !important;
-  overflow-wrap: anywhere !important;
-}
-
-.shop-page .product-card .product-card-price,
-.product-grid .product-card .product-card-price {
-  display: block !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  text-align: center !important;
-
-  font-size: 13px !important;
-  line-height: 1.2 !important;
-
-  color: #555 !important;
-
-  white-space: nowrap !important;
-}
-
-/* Stop the hover animation from moving the product name
-   away from the center. */
-.product-card:hover h3,
-.product-card:hover .product-name {
-  transform: none !important;
-}
-
-
 /* ---------------------------------------------------------
    FOOTER — PENCILBOY CORPORATE
    Everything stays centered.
@@ -4317,530 +4062,27 @@ a {
 }
 
 
-/* ---------------------------------------------------------
-   NEWSLETTER POPUP
-   Compact Base44 / Yeezy-inspired structure.
-   --------------------------------------------------------- */
+/* =========================================================
+   NOT FOUND
+   ========================================================= */
 
-/* Common overlay names — keeps the styling compatible
-   with the existing popup implementation. */
-
-.newsletter-overlay,
-.newsletter-modal-overlay,
-.newsletter-popup-overlay,
-.subscribe-overlay {
-  position: fixed !important;
-
-  inset: 0 !important;
-
-  z-index: 99999 !important;
-
-  display: flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  padding: 24px !important;
-
-  background:
-    rgba(0, 0, 0, 0.62) !important;
-
-  backdrop-filter: blur(18px) saturate(85%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(85%) !important;
+.not-found-page {
+  min-height: 60vh;
+  padding: 80px 20px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
 }
 
-
-/* Main compact card */
-
-.newsletter-modal,
-.newsletter-popup,
-.newsletter-card,
-.subscribe-modal,
-.subscribe-popup {
-  position: relative !important;
-
-  width: min(560px, calc(100vw - 36px)) !important;
-
-  max-height: calc(100vh - 48px) !important;
-
-  overflow-y: auto !important;
-
-  margin: auto !important;
-
-  padding: 48px !important;
-
-  background:
-    rgba(244, 241, 234, 0.96) !important;
-
-  border: 1px solid
-    rgba(255, 255, 255, 0.45) !important;
-
-  box-shadow:
-    0 30px 90px rgba(0, 0, 0, 0.32) !important;
-
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-
-  animation:
-    pencilboyNewsletterIn
-    520ms
-    cubic-bezier(0.22, 1, 0.36, 1)
-    both !important;
+.not-found-page h1 {
+  margin: 16px 0 12px;
+  font-size: clamp(44px, 8vw, 96px);
+  line-height: .9;
+  letter-spacing: -.06em;
 }
 
-
-/* Keep nested content from creating the huge old layout */
-
-.newsletter-modal > *,
-.newsletter-popup > *,
-.newsletter-card > *,
-.subscribe-modal > *,
-.subscribe-popup > * {
-  max-width: 100%;
-}
-
-
-/* Close button */
-
-.newsletter-modal button[aria-label*="lose"],
-.newsletter-popup button[aria-label*="lose"],
-.newsletter-card button[aria-label*="lose"],
-.subscribe-modal button[aria-label*="lose"],
-.subscribe-popup button[aria-label*="lose"],
-.newsletter-close,
-.newsletter-popup-close,
-.newsletter-modal-close {
-  position: absolute !important;
-
-  top: 18px !important;
-  right: 18px !important;
-
-  width: 34px !important;
-  height: 34px !important;
-
-  display: grid !important;
-  place-items: center !important;
-
-  padding: 0 !important;
-
-  background: transparent !important;
-
-  color: #111 !important;
-
-  font-size: 24px !important;
-
-  line-height: 1 !important;
-
-  cursor: pointer !important;
-
-  opacity: 0.72;
-
-  transition:
-    opacity 180ms ease,
-    transform 180ms ease !important;
-}
-
-.newsletter-close:hover,
-.newsletter-popup-close:hover,
-.newsletter-modal-close:hover {
-  opacity: 1;
-
-  transform: rotate(90deg);
-}
-
-
-/* Newsletter heading */
-
-.newsletter-modal h1,
-.newsletter-popup h1,
-.newsletter-card h1,
-.subscribe-modal h1,
-.subscribe-popup h1 {
-  max-width: 470px !important;
-
-  margin: 18px 0 22px !important;
-
-  font-size: clamp(44px, 6vw, 72px) !important;
-
-  line-height: 0.86 !important;
-
-  letter-spacing: -0.065em !important;
-
-  font-weight: 900 !important;
-
-  text-align: left !important;
-}
-
-
-/* Description */
-
-.newsletter-modal p,
-.newsletter-popup p,
-.newsletter-card p,
-.subscribe-modal p,
-.subscribe-popup p {
-  max-width: 470px;
-
+.not-found-page p {
+  margin: 0 0 24px;
   color: #666;
-
-  font-size: 14px;
-
-  line-height: 1.5;
-}
-
-
-/* Email form */
-
-.newsletter-modal form,
-.newsletter-popup form,
-.newsletter-card form,
-.subscribe-modal form,
-.subscribe-popup form {
-  width: 100%;
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 10px;
-
-  margin-top: 30px;
-}
-
-
-/* Email input */
-
-.newsletter-modal input[type="email"],
-.newsletter-popup input[type="email"],
-.newsletter-card input[type="email"],
-.subscribe-modal input[type="email"],
-.subscribe-popup input[type="email"] {
-  width: 100% !important;
-
-  min-height: 56px !important;
-
-  padding: 0 16px !important;
-
-  border: 1px solid #111 !important;
-
-  border-radius: 0 !important;
-
-  outline: none !important;
-
-  background: rgba(255, 255, 255, 0.24) !important;
-
-  color: #111 !important;
-
-  font-size: 14px !important;
-
-  box-sizing: border-box !important;
-}
-
-.newsletter-modal input[type="email"]:focus,
-.newsletter-popup input[type="email"]:focus,
-.newsletter-card input[type="email"]:focus,
-.subscribe-modal input[type="email"]:focus,
-.subscribe-popup input[type="email"]:focus {
-  box-shadow: inset 0 0 0 1px #111 !important;
-}
-
-
-/* Subscribe button */
-
-.newsletter-modal form button[type="submit"],
-.newsletter-popup form button[type="submit"],
-.newsletter-card form button[type="submit"],
-.subscribe-modal form button[type="submit"],
-.subscribe-popup form button[type="submit"] {
-  width: 100% !important;
-
-  min-height: 56px !important;
-
-  display: flex !important;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  background: #111 !important;
-
-  color: #fff !important;
-
-  border: 1px solid #111 !important;
-
-  border-radius: 0 !important;
-
-  font-family: "DM Mono", monospace !important;
-
-  font-size: 11px !important;
-
-  letter-spacing: 0.18em !important;
-
-  text-transform: uppercase !important;
-
-  transition:
-    background 180ms ease,
-    color 180ms ease !important;
-}
-
-.newsletter-modal form button[type="submit"]:hover,
-.newsletter-popup form button[type="submit"]:hover,
-.newsletter-card form button[type="submit"]:hover,
-.subscribe-modal form button[type="submit"]:hover,
-.subscribe-popup form button[type="submit"]:hover {
-  background: transparent !important;
-
-  color: #111 !important;
-}
-
-
-/* Error / success message */
-
-.newsletter-modal .error,
-.newsletter-popup .error,
-.newsletter-card .error,
-.subscribe-modal .error,
-.subscribe-popup .error,
-.newsletter-error,
-.newsletter-message {
-  margin-top: 12px !important;
-
-  font-family: "DM Mono", monospace !important;
-
-  font-size: 10px !important;
-
-  letter-spacing: 0.08em !important;
-
-  line-height: 1.5 !important;
-
-  text-transform: uppercase !important;
-}
-
-
-/* Animation */
-
-@keyframes pencilboyNewsletterIn {
-  from {
-    opacity: 0;
-
-    transform:
-      translateY(24px)
-      scale(0.97);
-  }
-
-  to {
-    opacity: 1;
-
-    transform:
-      translateY(0)
-      scale(1);
-  }
-}
-
-
-/* ---------------------------------------------------------
-   MOBILE
-   --------------------------------------------------------- */
-
-@media (max-width: 600px) {
-  .newsletter-overlay,
-  .newsletter-modal-overlay,
-  .newsletter-popup-overlay,
-  .subscribe-overlay {
-    align-items: flex-end !important;
-
-    padding: 0 !important;
-  }
-
-  .newsletter-modal,
-  .newsletter-popup,
-  .newsletter-card,
-  .subscribe-modal,
-  .subscribe-popup {
-    width: 100% !important;
-
-    max-width: none !important;
-
-    max-height: 82vh !important;
-
-    padding:
-      38px
-      24px
-      calc(30px + env(safe-area-inset-bottom)) !important;
-
-    border-left: 0 !important;
-    border-right: 0 !important;
-    border-bottom: 0 !important;
-
-    animation-name: pencilboyNewsletterMobileIn !important;
-  }
-
-  .newsletter-modal h1,
-  .newsletter-popup h1,
-  .newsletter-card h1,
-  .subscribe-modal h1,
-  .subscribe-popup h1 {
-    font-size: clamp(42px, 13vw, 62px) !important;
-
-    max-width: 100% !important;
-
-    margin-top: 8px !important;
-  }
-
-  .newsletter-modal p,
-  .newsletter-popup p,
-  .newsletter-card p,
-  .subscribe-modal p,
-  .subscribe-popup p {
-    font-size: 13px;
-  }
-
-  .newsletter-modal form,
-  .newsletter-popup form,
-  .newsletter-card form,
-  .subscribe-modal form,
-  .subscribe-popup form {
-    margin-top: 24px;
-  }
-}
-
-@keyframes pencilboyNewsletterMobileIn {
-  from {
-    opacity: 0;
-
-    transform: translateY(100%);
-  }
-
-  to {
-    opacity: 1;
-
-    transform: translateY(0);
-  }
-}
-
-
-/* ---------------------------------------------------------
-   VERY SMALL PHONES
-   --------------------------------------------------------- */
-
-@media (max-width: 380px) {
-  .newsletter-modal,
-  .newsletter-popup,
-  .newsletter-card,
-  .subscribe-modal,
-  .subscribe-popup {
-    padding:
-      32px
-      18px
-      calc(24px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .newsletter-modal h1,
-  .newsletter-popup h1,
-  .newsletter-card h1,
-  .subscribe-modal h1,
-  .subscribe-popup h1 {
-    font-size: 40px !important;
-  }
-}
-
-
-/* ---------------------------------------------------------
-   FOOTER — MOBILE CENTERING
-   --------------------------------------------------------- */
-
-@media (max-width: 700px) {
-  .footer-bottom {
-    padding-top: 28px !important;
-    padding-bottom: 28px !important;
-
-    gap: 20px !important;
-
-    text-align: center !important;
-  }
-
-  .footer-bottom-links {
-    gap: 15px 22px !important;
-  }
-
-  .footer-bottom-links a {
-    font-size: 10px !important;
-  }
-
-  .footer-bottom > span {
-    font-size: 10px !important;
-  }
-}
-
-
-/* ---------------------------------------------------------
-   PRODUCT CARD — MOBILE
-   --------------------------------------------------------- */
-
-@media (max-width: 520px) {
-  .shop-page .product-card-info,
-  .product-grid .product-card-info {
-    display: flex !important;
-
-    flex-direction: column !important;
-
-    align-items: center !important;
-    justify-content: center !important;
-
-    gap: 5px !important;
-
-    padding:
-      10px
-      5px
-      0 !important;
-
-    text-align: center !important;
-  }
-
-  .shop-page .product-card .product-name,
-  .product-grid .product-card .product-name {
-    width: 100% !important;
-
-    font-size: 11px !important;
-
-    text-align: center !important;
-  }
-
-  .shop-page .product-card .product-card-price,
-  .product-grid .product-card .product-card-price {
-    width: 100% !important;
-
-    font-size: 10px !important;
-
-    text-align: center !important;
-  }
-}
-
-
-/* ---------------------------------------------------------
-   VERY SMALL PHONES — STILL CENTERED
-   --------------------------------------------------------- */
-
-@media (max-width: 380px) {
-  .shop-page .product-card-info,
-  .product-grid .product-card-info {
-    width: 100% !important;
-
-    align-items: center !important;
-
-    text-align: center !important;
-  }
-
-  .shop-page .product-card .product-name,
-  .product-grid .product-card .product-name {
-    font-size: 9px !important;
-
-    text-align: center !important;
-  }
-
-  .shop-page .product-card .product-card-price,
-  .product-grid .product-card .product-card-price {
-    font-size: 8px !important;
-
-    text-align: center !important;
-  }
 }

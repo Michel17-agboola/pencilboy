@@ -1,15 +1,11 @@
-import {
-  Minus,
+import { Minus,
   Plus,
   X,
   ArrowRight,
 } from "lucide-react";
 import PageIntro from "../components/PageIntro";
+import { formatNaira } from "../lib/format";
 
-const money = (n) =>
-  `₦${Number(
-    n || 0
-  ).toLocaleString("en-NG")}`;
 
 const firstImage = (p) =>
   Array.isArray(p?.images)
@@ -134,7 +130,7 @@ export default function Bag({
                   </div>
 
                   <strong>
-                    {money(
+                    {formatNaira(
                       item.price *
                         item.qty
                     )}
@@ -168,7 +164,7 @@ export default function Bag({
               <span>TOTAL</span>
 
               <strong>
-                {money(total)}
+                {formatNaira(total)}
               </strong>
 
               <button

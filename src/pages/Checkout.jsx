@@ -2,8 +2,8 @@ import { useState } from "react";
 import PageIntro from "../components/PageIntro";
 import { supabase } from "../lib/supabase";
 
-const money = (n) => `₦${Number(n || 0).toLocaleString("en-NG")}`;
 
+import { formatNaira } from "../lib/format";
 export default function Checkout({ cart, user, navigate, clearCart }) {
   const [email, setEmail] = useState(user?.email || "");
   const [name, setName] = useState("");
@@ -11,12 +11,14 @@ export default function Checkout({ cart, user, navigate, clearCart }) {
   const [city, setCity] = useState("Lagos");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
 
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   async function submit(event) {
     event.preventDefault();
     setLoading(true);
+    setError("");
 
     try {
       const { data: order, error } = await supabase
@@ -50,7 +52,7 @@ export default function Checkout({ cart, user, navigate, clearCart }) {
       clearCart();
       setDone(true);
     } catch (error) {
-      alert(error.message || "Unable to place order.");
+      setError(error.message || "Unable to place order. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -73,6 +75,7 @@ export default function Checkout({ cart, user, navigate, clearCart }) {
 
       <form className="checkout-grid" onSubmit={submit}>
         <div>
+          {error && <div className="form-error" role="alert">{error}</div>}
           <label>Email<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
           <label>Full name<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
           <label>Shipping address<textarea value={address} onChange={(e) => setAddress(e.target.value)} required /></label>
@@ -84,11 +87,11 @@ export default function Checkout({ cart, user, navigate, clearCart }) {
           {cart.map((item) => (
             <p key={`${item.id}-${item.size}`}>
               {item.name} × {item.qty}
-              <b>{money(item.price * item.qty)}</b>
+              <b>{formatNaira(item.price * item.qty)}</b>
             </p>
           ))}
           <hr />
-          <h3>TOTAL <b>{money(total)}</b></h3>
+          <h3>TOTAL <b>{formatNaira(total)}</b></h3>
           <button className="add-bag" disabled={loading || !cart.length}>
             {loading ? "PLACING ORDER…" : "PLACE ORDER"}
           </button>

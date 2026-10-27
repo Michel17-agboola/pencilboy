@@ -22,7 +22,17 @@ export async function fetchPublishedProducts() {
 
   return (data || []).map((product) => ({
     ...product,
-    category: product.categories?.name || product.category || "",
+    category:
+      product.categories?.name || product.category || "",
     category_slug: product.categories?.slug || "",
   }));
+}
+
+export async function fetchStoreCatalogue() {
+  const [products, categories] = await Promise.all([
+    fetchPublishedProducts(),
+    fetchCategories(),
+  ]);
+
+  return { products, categories };
 }
