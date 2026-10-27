@@ -3870,3 +3870,977 @@ a {
     animation: none !important;
   }
 }
+/* =========================================================
+   PNCHE — COMPACT NEWSLETTER POPUP
+   BASE44-STYLE LAYOUT
+   ========================================================= */
+
+.newsletter-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.52);
+
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  animation: pncheNewsletterOverlayIn 380ms ease both;
+}
+
+.newsletter-modal-content {
+  position: relative;
+
+  width: min(100%, 430px);
+
+  padding: 38px 38px 34px;
+
+  background: #f4f1e9;
+  color: #111;
+
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+
+  animation: pncheNewsletterModalIn 480ms
+    cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+
+/* CLOSE */
+
+.newsletter-modal-close {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+
+  width: 30px;
+  height: 30px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  background: transparent;
+  color: #111;
+
+  cursor: pointer;
+
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.newsletter-modal-close:hover {
+  opacity: 0.5;
+  transform: rotate(8deg);
+}
+
+
+/* HEADER */
+
+.newsletter-modal-eyebrow {
+  display: block;
+
+  margin-bottom: 17px;
+
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  font-weight: 700;
+
+  line-height: 1;
+  letter-spacing: 0.26em;
+}
+
+.newsletter-modal-content h2 {
+  margin: 0;
+
+  max-width: 340px;
+
+  font-size: clamp(34px, 5vw, 48px);
+  font-weight: 800;
+  line-height: 0.88;
+
+  letter-spacing: -0.06em;
+}
+
+.newsletter-modal-content p {
+  max-width: 340px;
+
+  margin: 21px 0 25px;
+
+  color: #666;
+
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+
+/* FORM */
+
+.newsletter-modal-form {
+  width: 100%;
+}
+
+.newsletter-modal-form label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  font-family: "Courier New", monospace;
+  font-size: 7px;
+  font-weight: 700;
+
+  letter-spacing: 0.16em;
+}
+
+.newsletter-modal-form input {
+  width: 100%;
+  height: 42px;
+
+  padding: 0 11px;
+
+  border: 1px solid #222;
+  border-radius: 0;
+
+  outline: none;
+
+  background: transparent;
+  color: #111;
+
+  font-family: inherit;
+  font-size: 10px;
+
+  transition: background 160ms ease;
+}
+
+.newsletter-modal-form input::placeholder {
+  color: #999;
+}
+
+.newsletter-modal-form input:focus {
+  background: #fff;
+}
+
+.newsletter-modal-form button {
+  width: 100%;
+  height: 42px;
+
+  margin-top: 8px;
+
+  border: 1px solid #111;
+  border-radius: 0;
+
+  background: #111;
+  color: #fff;
+
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 700;
+
+  letter-spacing: 0.17em;
+
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.newsletter-modal-form button:hover:not(:disabled) {
+  background: transparent;
+  color: #111;
+}
+
+.newsletter-modal-form button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+
+/* CONSENT */
+
+.newsletter-modal-content small {
+  display: block;
+
+  max-width: 330px;
+
+  margin-top: 13px;
+
+  color: #888;
+
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+
+/* MESSAGE */
+
+.newsletter-modal-message {
+  margin-top: 12px;
+
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  font-weight: 700;
+
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  animation: pncheNewsletterMessageIn 220ms ease both;
+}
+
+.newsletter-modal-message.success {
+  color: #111;
+}
+
+.newsletter-modal-message.error {
+  color: #9b2525;
+}
+
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+@keyframes pncheNewsletterOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pncheNewsletterModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pncheNewsletterMessageIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .newsletter-modal {
+    padding: 16px;
+  }
+
+  .newsletter-modal-content {
+    width: min(100%, 370px);
+    padding: 34px 26px 29px;
+  }
+
+  .newsletter-modal-content h2 {
+    font-size: 36px;
+  }
+
+  .newsletter-modal-content p {
+    font-size: 10px;
+    margin-top: 19px;
+    margin-bottom: 23px;
+  }
+
+  .newsletter-modal-form input,
+  .newsletter-modal-form button {
+    height: 42px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newsletter-modal,
+  .newsletter-modal-content,
+  .newsletter-modal-message {
+    animation: none;
+  }
+}
+/* =========================================================
+   PENCILBOY — FINAL CENTER ALIGNMENT SYSTEM
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   PRODUCT CARDS
+   Name + price ALWAYS stay centered together.
+   --------------------------------------------------------- */
+
+.shop-page .product-card-info,
+.product-grid .product-card-info {
+  width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 6px !important;
+
+  margin: 0 !important;
+  padding: 14px 8px 0 !important;
+
+  text-align: center !important;
+}
+
+.shop-page .product-card .product-name,
+.product-grid .product-card .product-name {
+  width: 100% !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  text-align: center !important;
+
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 500 !important;
+
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.shop-page .product-card .product-card-price,
+.product-grid .product-card .product-card-price {
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  text-align: center !important;
+
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+
+  color: #555 !important;
+
+  white-space: nowrap !important;
+}
+
+/* Stop the hover animation from moving the product name
+   away from the center. */
+.product-card:hover h3,
+.product-card:hover .product-name {
+  transform: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER — PENCILBOY CORPORATE
+   Everything stays centered.
+   --------------------------------------------------------- */
+
+.site-footer {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.footer-bottom {
+  width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 22px !important;
+
+  text-align: center !important;
+}
+
+.footer-bottom > strong {
+  display: block;
+
+  width: 100%;
+
+  text-align: center !important;
+
+  margin: 0 !important;
+}
+
+.footer-bottom-links {
+  width: 100%;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex-wrap: wrap !important;
+
+  gap: 18px 30px !important;
+
+  text-align: center !important;
+}
+
+.footer-bottom-links a {
+  display: inline-block;
+
+  text-align: center !important;
+
+  white-space: nowrap;
+}
+
+.footer-bottom > span {
+  display: block;
+
+  width: 100%;
+
+  text-align: center !important;
+
+  margin: 0 !important;
+}
+
+
+/* ---------------------------------------------------------
+   NEWSLETTER POPUP
+   Compact Base44 / Yeezy-inspired structure.
+   --------------------------------------------------------- */
+
+/* Common overlay names — keeps the styling compatible
+   with the existing popup implementation. */
+
+.newsletter-overlay,
+.newsletter-modal-overlay,
+.newsletter-popup-overlay,
+.subscribe-overlay {
+  position: fixed !important;
+
+  inset: 0 !important;
+
+  z-index: 99999 !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 24px !important;
+
+  background:
+    rgba(0, 0, 0, 0.62) !important;
+
+  backdrop-filter: blur(18px) saturate(85%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(85%) !important;
+}
+
+
+/* Main compact card */
+
+.newsletter-modal,
+.newsletter-popup,
+.newsletter-card,
+.subscribe-modal,
+.subscribe-popup {
+  position: relative !important;
+
+  width: min(560px, calc(100vw - 36px)) !important;
+
+  max-height: calc(100vh - 48px) !important;
+
+  overflow-y: auto !important;
+
+  margin: auto !important;
+
+  padding: 48px !important;
+
+  background:
+    rgba(244, 241, 234, 0.96) !important;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.45) !important;
+
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.32) !important;
+
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+
+  animation:
+    pencilboyNewsletterIn
+    520ms
+    cubic-bezier(0.22, 1, 0.36, 1)
+    both !important;
+}
+
+
+/* Keep nested content from creating the huge old layout */
+
+.newsletter-modal > *,
+.newsletter-popup > *,
+.newsletter-card > *,
+.subscribe-modal > *,
+.subscribe-popup > * {
+  max-width: 100%;
+}
+
+
+/* Close button */
+
+.newsletter-modal button[aria-label*="lose"],
+.newsletter-popup button[aria-label*="lose"],
+.newsletter-card button[aria-label*="lose"],
+.subscribe-modal button[aria-label*="lose"],
+.subscribe-popup button[aria-label*="lose"],
+.newsletter-close,
+.newsletter-popup-close,
+.newsletter-modal-close {
+  position: absolute !important;
+
+  top: 18px !important;
+  right: 18px !important;
+
+  width: 34px !important;
+  height: 34px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 0 !important;
+
+  background: transparent !important;
+
+  color: #111 !important;
+
+  font-size: 24px !important;
+
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+
+  opacity: 0.72;
+
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease !important;
+}
+
+.newsletter-close:hover,
+.newsletter-popup-close:hover,
+.newsletter-modal-close:hover {
+  opacity: 1;
+
+  transform: rotate(90deg);
+}
+
+
+/* Newsletter heading */
+
+.newsletter-modal h1,
+.newsletter-popup h1,
+.newsletter-card h1,
+.subscribe-modal h1,
+.subscribe-popup h1 {
+  max-width: 470px !important;
+
+  margin: 18px 0 22px !important;
+
+  font-size: clamp(44px, 6vw, 72px) !important;
+
+  line-height: 0.86 !important;
+
+  letter-spacing: -0.065em !important;
+
+  font-weight: 900 !important;
+
+  text-align: left !important;
+}
+
+
+/* Description */
+
+.newsletter-modal p,
+.newsletter-popup p,
+.newsletter-card p,
+.subscribe-modal p,
+.subscribe-popup p {
+  max-width: 470px;
+
+  color: #666;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* Email form */
+
+.newsletter-modal form,
+.newsletter-popup form,
+.newsletter-card form,
+.subscribe-modal form,
+.subscribe-popup form {
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-top: 30px;
+}
+
+
+/* Email input */
+
+.newsletter-modal input[type="email"],
+.newsletter-popup input[type="email"],
+.newsletter-card input[type="email"],
+.subscribe-modal input[type="email"],
+.subscribe-popup input[type="email"] {
+  width: 100% !important;
+
+  min-height: 56px !important;
+
+  padding: 0 16px !important;
+
+  border: 1px solid #111 !important;
+
+  border-radius: 0 !important;
+
+  outline: none !important;
+
+  background: rgba(255, 255, 255, 0.24) !important;
+
+  color: #111 !important;
+
+  font-size: 14px !important;
+
+  box-sizing: border-box !important;
+}
+
+.newsletter-modal input[type="email"]:focus,
+.newsletter-popup input[type="email"]:focus,
+.newsletter-card input[type="email"]:focus,
+.subscribe-modal input[type="email"]:focus,
+.subscribe-popup input[type="email"]:focus {
+  box-shadow: inset 0 0 0 1px #111 !important;
+}
+
+
+/* Subscribe button */
+
+.newsletter-modal form button[type="submit"],
+.newsletter-popup form button[type="submit"],
+.newsletter-card form button[type="submit"],
+.subscribe-modal form button[type="submit"],
+.subscribe-popup form button[type="submit"] {
+  width: 100% !important;
+
+  min-height: 56px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: #111 !important;
+
+  color: #fff !important;
+
+  border: 1px solid #111 !important;
+
+  border-radius: 0 !important;
+
+  font-family: "DM Mono", monospace !important;
+
+  font-size: 11px !important;
+
+  letter-spacing: 0.18em !important;
+
+  text-transform: uppercase !important;
+
+  transition:
+    background 180ms ease,
+    color 180ms ease !important;
+}
+
+.newsletter-modal form button[type="submit"]:hover,
+.newsletter-popup form button[type="submit"]:hover,
+.newsletter-card form button[type="submit"]:hover,
+.subscribe-modal form button[type="submit"]:hover,
+.subscribe-popup form button[type="submit"]:hover {
+  background: transparent !important;
+
+  color: #111 !important;
+}
+
+
+/* Error / success message */
+
+.newsletter-modal .error,
+.newsletter-popup .error,
+.newsletter-card .error,
+.subscribe-modal .error,
+.subscribe-popup .error,
+.newsletter-error,
+.newsletter-message {
+  margin-top: 12px !important;
+
+  font-family: "DM Mono", monospace !important;
+
+  font-size: 10px !important;
+
+  letter-spacing: 0.08em !important;
+
+  line-height: 1.5 !important;
+
+  text-transform: uppercase !important;
+}
+
+
+/* Animation */
+
+@keyframes pencilboyNewsletterIn {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(24px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .newsletter-overlay,
+  .newsletter-modal-overlay,
+  .newsletter-popup-overlay,
+  .subscribe-overlay {
+    align-items: flex-end !important;
+
+    padding: 0 !important;
+  }
+
+  .newsletter-modal,
+  .newsletter-popup,
+  .newsletter-card,
+  .subscribe-modal,
+  .subscribe-popup {
+    width: 100% !important;
+
+    max-width: none !important;
+
+    max-height: 82vh !important;
+
+    padding:
+      38px
+      24px
+      calc(30px + env(safe-area-inset-bottom)) !important;
+
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+
+    animation-name: pencilboyNewsletterMobileIn !important;
+  }
+
+  .newsletter-modal h1,
+  .newsletter-popup h1,
+  .newsletter-card h1,
+  .subscribe-modal h1,
+  .subscribe-popup h1 {
+    font-size: clamp(42px, 13vw, 62px) !important;
+
+    max-width: 100% !important;
+
+    margin-top: 8px !important;
+  }
+
+  .newsletter-modal p,
+  .newsletter-popup p,
+  .newsletter-card p,
+  .subscribe-modal p,
+  .subscribe-popup p {
+    font-size: 13px;
+  }
+
+  .newsletter-modal form,
+  .newsletter-popup form,
+  .newsletter-card form,
+  .subscribe-modal form,
+  .subscribe-popup form {
+    margin-top: 24px;
+  }
+}
+
+@keyframes pencilboyNewsletterMobileIn {
+  from {
+    opacity: 0;
+
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   VERY SMALL PHONES
+   --------------------------------------------------------- */
+
+@media (max-width: 380px) {
+  .newsletter-modal,
+  .newsletter-popup,
+  .newsletter-card,
+  .subscribe-modal,
+  .subscribe-popup {
+    padding:
+      32px
+      18px
+      calc(24px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .newsletter-modal h1,
+  .newsletter-popup h1,
+  .newsletter-card h1,
+  .subscribe-modal h1,
+  .subscribe-popup h1 {
+    font-size: 40px !important;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER — MOBILE CENTERING
+   --------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .footer-bottom {
+    padding-top: 28px !important;
+    padding-bottom: 28px !important;
+
+    gap: 20px !important;
+
+    text-align: center !important;
+  }
+
+  .footer-bottom-links {
+    gap: 15px 22px !important;
+  }
+
+  .footer-bottom-links a {
+    font-size: 10px !important;
+  }
+
+  .footer-bottom > span {
+    font-size: 10px !important;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   PRODUCT CARD — MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 520px) {
+  .shop-page .product-card-info,
+  .product-grid .product-card-info {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 5px !important;
+
+    padding:
+      10px
+      5px
+      0 !important;
+
+    text-align: center !important;
+  }
+
+  .shop-page .product-card .product-name,
+  .product-grid .product-card .product-name {
+    width: 100% !important;
+
+    font-size: 11px !important;
+
+    text-align: center !important;
+  }
+
+  .shop-page .product-card .product-card-price,
+  .product-grid .product-card .product-card-price {
+    width: 100% !important;
+
+    font-size: 10px !important;
+
+    text-align: center !important;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   VERY SMALL PHONES — STILL CENTERED
+   --------------------------------------------------------- */
+
+@media (max-width: 380px) {
+  .shop-page .product-card-info,
+  .product-grid .product-card-info {
+    width: 100% !important;
+
+    align-items: center !important;
+
+    text-align: center !important;
+  }
+
+  .shop-page .product-card .product-name,
+  .product-grid .product-card .product-name {
+    font-size: 9px !important;
+
+    text-align: center !important;
+  }
+
+  .shop-page .product-card .product-card-price,
+  .product-grid .product-card .product-card-price {
+    font-size: 8px !important;
+
+    text-align: center !important;
+  }
+}
