@@ -142,41 +142,45 @@ export async function trackCartAdd(
  * can see the real number of active likes.
  */
 
-export async function saveProductLike(
-  productId
-) {
+export async function saveProductLike(productId) {
   if (!productId) {
     return false;
   }
 
   try {
-    const sessionId =
-      getSessionId();
+    const userId = await getCurrentUserId();
 
-    const userId =
-      await getCurrentUserId();
+    /*
+     * Guests keep saved products locally.
+     * Do not persist guest likes to Supabase because
+     * client-generated session IDs are not a trusted
+     * security boundary.
+     */
+    if (!userId) {
+      await trackEvent("LIKE", {
+        productId,
+      });
+
+      return true;
+    }
 
     const payload = {
       product_id: productId,
-      session_id: sessionId,
       user_id: userId,
     };
 
-    const { error } =
-      await supabase
-        .from("product_likes")
-        .insert(payload);
+    const { error } = await supabase
+      .from("product_likes")
+      .insert(payload);
 
     /*
-     * If the like already exists because the user
-     * clicked twice or the browser state is out of sync,
-     * don't treat that as a fatal error.
+     * If the like already exists, don't treat it
+     * as a fatal error.
      */
     if (
       error &&
-      !String(
-        error.message || ""
-      ).toLowerCase()
+      !String(error.message || "")
+        .toLowerCase()
         .includes("duplicate")
     ) {
       console.warn(
@@ -187,9 +191,6 @@ export async function saveProductLike(
       return false;
     }
 
-    /*
-     * Also record the activity event.
-     */
     await trackEvent("LIKE", {
       productId,
     });
@@ -205,52 +206,31 @@ export async function saveProductLike(
   }
 }
 
-export async function removeProductLike(
-  productId
-) {
+export async function removeProductLike(productId) {
   if (!productId) {
     return false;
   }
 
   try {
-    const sessionId =
-      getSessionId();
-
-    const userId =
-      await getCurrentUserId();
-
-    let query =
-      supabase
-        .from("product_likes")
-        .delete()
-        .eq(
-          "product_id",
-          productId
-        );
+    const userId = await getCurrentUserId();
 
     /*
-     * Logged-in users:
-     * remove their own product like.
+     * Guests keep saved products locally.
+     * There is no Supabase row to remove.
      */
-    if (userId) {
-      query = query.eq(
-        "user_id",
-        userId
-      );
-    } else {
-      /*
-       * Guests:
-       * remove the like belonging to
-       * this browser session.
-       */
-      query = query.eq(
-        "session_id",
-        sessionId
-      );
+    if (!userId) {
+      await trackEvent("UNLIKE", {
+        productId,
+      });
+
+      return true;
     }
 
-    const { error } =
-      await query;
+    const { error } = await supabase
+      .from("product_likes")
+      .delete()
+      .eq("product_id", productId)
+      .eq("user_id", userId);
 
     if (error) {
       console.warn(
@@ -261,12 +241,9 @@ export async function removeProductLike(
       return false;
     }
 
-    await trackEvent(
-      "UNLIKE",
-      {
-        productId,
-      }
-    );
+    await trackEvent("UNLIKE", {
+      productId,
+    });
 
     return true;
   } catch (error) {
