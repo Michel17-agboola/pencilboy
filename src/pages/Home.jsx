@@ -107,7 +107,7 @@ export default function Home({ navigate }) {
             className="landing-enter"
             type="button"
             onClick={() => navigate("/shop")}
-          >
+          > 
             ENTER
             <span>→</span>
           </button>

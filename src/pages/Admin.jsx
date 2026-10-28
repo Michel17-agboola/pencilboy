@@ -1849,9 +1849,19 @@ export default function Admin({
     setLoading(false);
   };
 
-  useEffect(() => {
+ useEffect(() => {
+  checkAdmin();
+
+  const {
+    data: { subscription }
+  } = supabase.auth.onAuthStateChange(() => {
     checkAdmin();
-  }, []);
+  });
+
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []);
 
   useEffect(() => {
     if (isAdmin) {
