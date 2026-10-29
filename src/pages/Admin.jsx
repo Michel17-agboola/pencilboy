@@ -182,7 +182,7 @@ function PasswordReset({ onComplete }) {
                 className="admin-secondary-button"
                 type="button"
                 onClick={() => {
-                  window.location.href = "/admin";
+                  window.location.href = "/admin/#/admin";
                 }}
               >
                 BACK TO SIGN IN
@@ -260,7 +260,8 @@ function AdminLogin({ onLoggedIn }) {
       await supabase.auth.resetPasswordForEmail(
         cleanEmail,
         {
-          redirectTo: `${window.location.origin}/admin/#/admin?reset=true`
+          redirectTo:
+            "https://pencilboy.vercel.app/admin/#/admin?reset=true"
         }
       );
 
