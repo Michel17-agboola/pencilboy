@@ -39,10 +39,169 @@ function splitValues(value) {
 }
 
 
+function PasswordReset({ onComplete }) {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
+  const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] =
+    useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+
+      if (!data.session) {
+        setError(
+          "This password reset link is invalid or has expired. Please request a new one."
+        );
+      }
+
+      setCheckingSession(false);
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const submit = async event => {
+    event.preventDefault();
+    setError("");
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+
+    const { error: updateError } =
+      await supabase.auth.updateUser({
+        password
+      });
+
+    if (updateError) {
+      setError(updateError.message);
+      setLoading(false);
+      return;
+    }
+
+    await supabase.auth.signOut();
+
+    setLoading(false);
+    onComplete();
+  };
+
+  return (
+    <main className="admin-auth">
+      <div className="admin-auth-card">
+        <div className="admin-mark">
+          PENCILBOY.
+        </div>
+
+        <div className="admin-auth-label">
+          PRIVATE ADMIN
+        </div>
+
+        <h1>Set new password</h1>
+
+        <p>
+          Create a new password for your
+          PENCILBOY admin account.
+        </p>
+
+        {checkingSession ? (
+          <div className="admin-empty">
+            Checking password reset link...
+          </div>
+        ) : (
+          <form onSubmit={submit}>
+            <label>
+              NEW PASSWORD
+
+              <input
+                type="password"
+                value={password}
+                onChange={event =>
+                  setPassword(event.target.value)
+                }
+                placeholder="••••••••"
+                minLength={8}
+                required
+                disabled={Boolean(error)}
+              />
+            </label>
+
+            <label>
+              CONFIRM PASSWORD
+
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={event =>
+                  setConfirmPassword(
+                    event.target.value
+                  )
+                }
+                placeholder="••••••••"
+                minLength={8}
+                required
+                disabled={Boolean(error)}
+              />
+            </label>
+
+            {error && (
+              <div className="admin-error">
+                {error}
+              </div>
+            )}
+
+            {!error && (
+              <button
+                className="admin-primary-button"
+                type="submit"
+                disabled={loading}
+              >
+                {loading
+                  ? "UPDATING..."
+                  : "SET NEW PASSWORD"}
+              </button>
+            )}
+
+            {error && (
+              <button
+                className="admin-secondary-button"
+                type="button"
+                onClick={() => {
+                  window.location.href = "/admin";
+                }}
+              >
+                BACK TO SIGN IN
+              </button>
+            )}
+          </form>
+        )}
+      </div>
+    </main>
+  );
+}
+
 function AdminLogin({ onLoggedIn }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
   const [error, setError] = useState("");
 
   const submit = async event => {
@@ -82,6 +241,126 @@ function AdminLogin({ onLoggedIn }) {
     onLoggedIn(data.user);
     setLoading(false);
   };
+
+  const sendPasswordReset = async event => {
+    event.preventDefault();
+
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail) {
+      setError("Enter your email address first.");
+      return;
+    }
+
+    setForgotLoading(true);
+    setError("");
+    setForgotSent(false);
+
+    const { error: resetError } =
+      await supabase.auth.resetPasswordForEmail(
+        cleanEmail,
+        {
+          redirectTo: `${window.location.origin}/admin?reset=true`
+        }
+      );
+
+    if (resetError) {
+      setError(resetError.message);
+      setForgotLoading(false);
+      return;
+    }
+
+    setForgotSent(true);
+    setForgotLoading(false);
+  };
+
+  if (forgotMode) {
+    return (
+      <main className="admin-auth">
+        <div className="admin-auth-card">
+          <div className="admin-mark">
+            PENCILBOY.
+          </div>
+
+          <div className="admin-auth-label">
+            PRIVATE ADMIN
+          </div>
+
+          <h1>Reset password</h1>
+
+          <p>
+            Enter your admin email and we'll send
+            you a link to create a new password.
+          </p>
+
+          {forgotSent ? (
+            <>
+              <div className="admin-help">
+                Password reset email sent. Check your
+                inbox and follow the link to create a
+                new password.
+              </div>
+
+              <button
+                className="admin-secondary-button"
+                type="button"
+                onClick={() => {
+                  setForgotMode(false);
+                  setForgotSent(false);
+                  setError("");
+                }}
+              >
+                BACK TO SIGN IN
+              </button>
+            </>
+          ) : (
+            <form onSubmit={sendPasswordReset}>
+              <label>
+                EMAIL
+
+                <input
+                  type="email"
+                  value={email}
+                  onChange={event =>
+                    setEmail(event.target.value)
+                  }
+                  placeholder="admin@email.com"
+                  required
+                />
+              </label>
+
+              {error && (
+                <div className="admin-error">
+                  {error}
+                </div>
+              )}
+
+              <button
+                className="admin-primary-button"
+                type="submit"
+                disabled={forgotLoading}
+              >
+                {forgotLoading
+                  ? "SENDING..."
+                  : "SEND RESET LINK"}
+              </button>
+
+              <button
+                className="admin-secondary-button"
+                type="button"
+                onClick={() => {
+                  setForgotMode(false);
+                  setError("");
+                }}
+              >
+                BACK TO SIGN IN
+              </button>
+            </form>
+          )}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="admin-auth">
@@ -142,6 +421,17 @@ function AdminLogin({ onLoggedIn }) {
             {loading
               ? "SIGNING IN..."
               : "SIGN IN"}
+          </button>
+
+          <button
+            type="button"
+            className="admin-secondary-button"
+            onClick={() => {
+              setForgotMode(true);
+              setError("");
+            }}
+          >
+            FORGOT PASSWORD?
           </button>
         </form>
       </div>
@@ -1760,6 +2050,12 @@ export default function Admin({
     setEditingProduct
   ] = useState(null);
 
+  const [resetMode, setResetMode] = useState(
+    () =>
+      new URLSearchParams(window.location.search)
+        .get("reset") === "true"
+  );
+
   const checkAdmin = async () => {
     setChecking(true);
 
@@ -1941,6 +2237,22 @@ export default function Admin({
 
     navigate("/");
   };
+
+  if (resetMode) {
+    return (
+      <PasswordReset
+        onComplete={() => {
+          window.history.replaceState(
+            {},
+            "",
+            "/admin"
+          );
+
+          setResetMode(false);
+        }}
+      />
+    );
+  }
 
   if (checking) {
     return (
