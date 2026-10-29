@@ -260,7 +260,7 @@ function AdminLogin({ onLoggedIn }) {
       await supabase.auth.resetPasswordForEmail(
         cleanEmail,
         {
-          redirectTo: `${window.location.origin}/admin?reset=true`
+          redirectTo: `${window.location.origin}/admin/#/admin?reset=true`
         }
       );
 
@@ -2051,9 +2051,20 @@ export default function Admin({
   ] = useState(null);
 
   const [resetMode, setResetMode] = useState(
-    () =>
-      new URLSearchParams(window.location.search)
-        .get("reset") === "true"
+    () => {
+      const searchReset =
+        new URLSearchParams(window.location.search).get("reset");
+
+      const hashQuery =
+        window.location.hash.includes("?")
+          ? window.location.hash.split("?")[1]
+          : "";
+
+      const hashReset =
+        new URLSearchParams(hashQuery).get("reset");
+
+      return searchReset === "true" || hashReset === "true";
+    }
   );
 
   const checkAdmin = async () => {
@@ -2245,7 +2256,7 @@ export default function Admin({
           window.history.replaceState(
             {},
             "",
-            "/admin"
+            "/admin/#/admin"
           );
 
           setResetMode(false);
