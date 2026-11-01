@@ -180,8 +180,9 @@ export default function App() {
    * LOCAL SAVED STATE
    * -------------------------------------------------------
    *
-   * This remains temporarily while the persistent
-   * Supabase Likes system is being completed.
+   * Keep the local saved state as the fast UI state.
+   * Authenticated likes are persisted in Supabase; guest
+   * likes are tracked as analytics events.
    */
 
   useEffect(() => {
@@ -277,8 +278,8 @@ export default function App() {
    * SAVE / LIKE
    * -------------------------------------------------------
    *
-   * Persistent Supabase Likes will replace this local
-   * behaviour in the next step.
+   * Persist the like while keeping the UI state local
+   * for an immediate response.
    */
 
   const onSave = async (id) => {

@@ -1,16 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Search, Package, Tags, LogOut, Pencil, Trash2, X, Save, ArrowLeft, RefreshCw, Activity } from "lucide-react";
 import { supabase } from "../lib/supabase";
-
-// Supabase emits PASSWORD_RECOVERY when the reset link is opened.
-// Keep a small startup flag so the reset screen is not missed during redirect.
-let adminPasswordRecoveryDetected = false;
-
-supabase.auth.onAuthStateChange(event => {
-  if (event === "PASSWORD_RECOVERY") {
-    adminPasswordRecoveryDetected = true;
-  }
-});
 import AdminDashboard from "./AdminDashboard";
 import { formatNaira, slugify } from "../lib/format";
 import "../admin.css";
@@ -106,8 +96,6 @@ function PasswordReset({ onComplete }) {
     }
 
     await supabase.auth.signOut();
-
-        adminPasswordRecoveryDetected = false;
 
     setLoading(false);
     onComplete();
@@ -2076,11 +2064,7 @@ export default function Admin({
       const hashReset =
         new URLSearchParams(hashQuery).get("reset");
 
-      return (
-      adminPasswordRecoveryDetected ||
-      searchReset === "true" ||
-      hashReset === "true"
-    );
+      return searchReset === "true" || hashReset === "true";
     }
   );
 
@@ -2174,36 +2158,18 @@ export default function Admin({
   };
 
  useEffect(() => {
+  checkAdmin();
+
+  const {
+    data: { subscription }
+  } = supabase.auth.onAuthStateChange(() => {
     checkAdmin();
+  });
 
-    const {
-      data: { subscription }
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        adminPasswordRecoveryDetected = true;
-        setResetMode(true);
-        return;
-      }
-
-      if (event === "SIGNED_OUT") {
-        setSessionUser(null);
-        setIsAdmin(false);
-        return;
-      }
-
-      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
-        window.setTimeout(() => {
-          checkAdmin();
-        }, 0);
-      } else if (session) {
-        setSessionUser(session.user);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []);
 
   useEffect(() => {
     if (isAdmin) {

@@ -464,6 +464,36 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     loadDashboard();
+
+    const channel = supabase
+      .channel("admin-store-activity")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "store_events",
+        },
+        () => {
+          loadDashboard(true);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "product_likes",
+        },
+        () => {
+          loadDashboard(true);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const validOrders = useMemo(
@@ -649,8 +679,59 @@ export default function AdminDashboard() {
           "CART_ADD"
       ).length;
 
+    // Authenticated likes are stored in product_likes.
+    // Count unique user/product pairs so duplicate rows cannot inflate the metric.
+    const authenticatedLikeKeys = new Set();
+
+    productLikes.forEach((like) => {
+      if (like?.user_id && like?.product_id) {
+        authenticatedLikeKeys.add(
+          `${like.user_id}:${like.product_id}`
+        );
+      }
+    });
+
+    // Guest likes are tracked as LIKE / UNLIKE events because
+    // guests do not have a trusted auth user id. Reconstruct
+    // their current active state from those events.
+    const guestLikeState = new Map();
+
+    [...storeEvents]
+      .filter(
+        (event) =>
+          !event.user_id &&
+          event.product_id &&
+          (event.event_type === "LIKE" ||
+            event.event_type === "UNLIKE")
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() -
+          new Date(b.created_at).getTime()
+      )
+      .forEach((event) => {
+        const actor =
+          event.session_id || event.id;
+
+        if (!actor) return;
+
+        const key =
+          `${actor}:${event.product_id}`;
+
+        guestLikeState.set(
+          key,
+          event.event_type === "LIKE"
+        );
+      });
+
+    const activeGuestLikes =
+      [...guestLikeState.values()].filter(
+        Boolean
+      ).length;
+
     const activeLikes =
-      productLikes.length;
+      authenticatedLikeKeys.size +
+      activeGuestLikes;
 
     return {
       visitors:
@@ -1323,17 +1404,4 @@ export default function AdminDashboard() {
       </div>
     </section>
   );
-}supabase
-.channel("admin-product-likes")
-.on(
-  "postgres_changes",
-  {
-    event: "*",
-    schema: "public",
-    table: "product_likes",
-  },
-  () => {
-    loadDashboard(true);
-  }
-)
-.subscribe();
+}
