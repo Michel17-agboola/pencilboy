@@ -15,7 +15,11 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
-import { formatNaira, formatNumber, formatDate, formatShortDate } from "../lib/format";
+import {
+  formatNaira,
+  formatNumber,
+  formatDate,
+} from "../lib/format";
 
 const EXCLUDED_STATUSES = [
   "CANCELLED",
@@ -30,7 +34,6 @@ const RANGE_OPTIONS = [
   { key: "30d", label: "30 Days" },
   { key: "12m", label: "12 Months" },
 ];
-
 
 function getStartDate(range) {
   const now = new Date();
@@ -294,6 +297,18 @@ function ActivityCard({
   );
 }
 
+function getReadableError(error, source) {
+  if (!error) return "";
+
+  const message =
+    error?.message ||
+    error?.details ||
+    error?.hint ||
+    "Unknown Supabase error";
+
+  return `${source}: ${message}`;
+}
+
 export default function AdminDashboard() {
   const [range, setRange] = useState("7d");
 
@@ -318,133 +333,153 @@ export default function AdminDashboard() {
     setError("");
 
     try {
-      const [
-        ordersResult,
-        itemsResult,
-        productsResult,
-        eventsResult,
-        likesResult,
-      ] = await Promise.all([
-        supabase
-          .from("orders")
-          .select("*")
-          .order("created_at", {
-            ascending: false,
-          }),
-
-        supabase
-          .from("order_items")
-          .select("*")
-          .order("created_at", {
-            ascending: false,
-          }),
-
-        supabase
-          .from("products")
-          .select(
-            "*, categories(id, name, slug)"
-          )
-          .order("created_at", {
-            ascending: false,
-          }),
-
-        supabase
-          .from("store_events")
-          .select("*")
-          .order("created_at", {
-            ascending: false,
-          }),
-
-        supabase
-          .from("product_likes")
-          .select("*")
-          .order("created_at", {
-            ascending: false,
-          }),
-      ]);
+      /*
+       * PRODUCTS
+       */
+      const productsResult = await supabase
+        .from("products")
+        .select(
+          "*, categories(id, name, slug)"
+        )
+        .order("created_at", {
+          ascending: false,
+        });
 
       if (productsResult.error) {
-        throw productsResult.error;
+        throw new Error(
+          getReadableError(
+            productsResult.error,
+            "Products"
+          )
+        );
       }
 
       /*
-       * Orders and order_items belong to the Commerce phase.
-       * If those tables do not exist yet, the dashboard
-       * should still load catalogue and inventory data.
+       * ORDERS
+       *
+       * These tables are not currently part of the
+       * database, so their absence is intentionally
+       * treated as an empty commerce dataset.
        */
-      const ordersUnavailable =
-        ordersResult.error &&
-        /relation .*orders.* does not exist|could not find the table/i.test(
-          ordersResult.error.message || ""
-        );
+      let ordersData = [];
+      let orderItemsData = [];
 
-      const orderItemsUnavailable =
-        itemsResult.error &&
-        /relation .*order_items.* does not exist|could not find the table/i.test(
-          itemsResult.error.message || ""
-        );
+      const ordersResult = await supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", {
+          ascending: false,
+        });
 
-      if (
-        ordersResult.error &&
-        !ordersUnavailable
-      ) {
-        throw ordersResult.error;
+      if (ordersResult.error) {
+        const message =
+          ordersResult.error.message || "";
+
+        const unavailable =
+          /relation .*orders.* does not exist|could not find the table/i.test(
+            message
+          );
+
+        if (!unavailable) {
+          throw new Error(
+            getReadableError(
+              ordersResult.error,
+              "Orders"
+            )
+          );
+        }
+      } else {
+        ordersData = ordersResult.data || [];
       }
 
-      if (
-        itemsResult.error &&
-        !orderItemsUnavailable
-      ) {
-        throw itemsResult.error;
+      const itemsResult = await supabase
+        .from("order_items")
+        .select("*")
+        .order("created_at", {
+          ascending: false,
+        });
+
+      if (itemsResult.error) {
+        const message =
+          itemsResult.error.message || "";
+
+        const unavailable =
+          /relation .*order_items.* does not exist|could not find the table/i.test(
+            message
+          );
+
+        if (!unavailable) {
+          throw new Error(
+            getReadableError(
+              itemsResult.error,
+              "Order items"
+            )
+          );
+        }
+      } else {
+        orderItemsData =
+          itemsResult.data || [];
       }
 
-      setOrders(
-        ordersUnavailable
-          ? []
-          : ordersResult.data || []
-      );
+      /*
+       * STOREFRONT ANALYTICS
+       *
+       * These are REQUIRED for the Store Activity
+       * section. We no longer silently convert an
+       * error into [].
+       */
+      const eventsResult = await supabase
+        .from("store_events")
+        .select("*")
+        .order("created_at", {
+          ascending: false,
+        });
 
-      setOrderItems(
-        orderItemsUnavailable
-          ? []
-          : itemsResult.data || []
-      );
+      if (eventsResult.error) {
+        throw new Error(
+          getReadableError(
+            eventsResult.error,
+            "Store events"
+          )
+        );
+      }
 
+      /*
+       * PERSISTENT AUTHENTICATED LIKES
+       */
+      const likesResult = await supabase
+        .from("product_likes")
+        .select("*")
+        .order("created_at", {
+          ascending: false,
+        });
+
+      if (likesResult.error) {
+        throw new Error(
+          getReadableError(
+            likesResult.error,
+            "Product likes"
+          )
+        );
+      }
+
+      /*
+       * Only update state after the required reads
+       * have succeeded.
+       */
       setProducts(
         productsResult.data || []
       );
 
-      /*
-       * Analytics tables are optional during the
-       * early storefront phases.
-       *
-       * If they cannot be read, the dashboard remains
-       * functional and activity simply shows zero.
-       */
-      if (eventsResult.error) {
-        console.warn(
-          "Dashboard store_events load error:",
-          eventsResult.error.message
-        );
-      }
-
-      if (likesResult.error) {
-        console.warn(
-          "Dashboard product_likes load error:",
-          likesResult.error.message
-        );
-      }
+      setOrders(ordersData);
+      setOrderItems(orderItemsData);
 
       setStoreEvents(
-        eventsResult.error
-          ? []
-          : eventsResult.data || []
+        eventsResult.data || []
       );
 
       setProductLikes(
-        likesResult.error
-          ? []
-          : likesResult.data || []
+        likesResult.data || []
       );
     } catch (err) {
       console.error(
@@ -623,7 +658,9 @@ export default function AdminDashboard() {
   }, [rangeOrders]);
 
   /*
+   * =====================================================
    * STORE ACTIVITY
+   * =====================================================
    *
    * Visitors:
    * Unique session IDs from VISITOR events.
@@ -635,8 +672,10 @@ export default function AdminDashboard() {
    * Number of CART_ADD events.
    *
    * Likes:
-   * Current persistent likes from product_likes.
+   * Authenticated persistent likes +
+   * reconstructed active guest likes.
    */
+
   const rangeStoreEvents = useMemo(
     () =>
       storeEvents.filter(
@@ -648,6 +687,9 @@ export default function AdminDashboard() {
   );
 
   const storeActivity = useMemo(() => {
+    /*
+     * VISITORS
+     */
     const visitorSessions =
       new Set();
 
@@ -665,6 +707,9 @@ export default function AdminDashboard() {
         );
       });
 
+    /*
+     * PRODUCT VIEWS
+     */
     const productViews =
       rangeStoreEvents.filter(
         (event) =>
@@ -672,6 +717,9 @@ export default function AdminDashboard() {
           "PRODUCT_VIEW"
       ).length;
 
+    /*
+     * CART ADDS
+     */
     const cartAdds =
       rangeStoreEvents.filter(
         (event) =>
@@ -679,30 +727,44 @@ export default function AdminDashboard() {
           "CART_ADD"
       ).length;
 
-    // Authenticated likes are stored in product_likes.
-    // Count unique user/product pairs so duplicate rows cannot inflate the metric.
-    const authenticatedLikeKeys = new Set();
+    /*
+     * AUTHENTICATED LIKES
+     */
+    const authenticatedLikeKeys =
+      new Set();
 
     productLikes.forEach((like) => {
-      if (like?.user_id && like?.product_id) {
+      if (
+        like?.user_id &&
+        like?.product_id
+      ) {
         authenticatedLikeKeys.add(
           `${like.user_id}:${like.product_id}`
         );
       }
     });
 
-    // Guest likes are tracked as LIKE / UNLIKE events because
-    // guests do not have a trusted auth user id. Reconstruct
-    // their current active state from those events.
-    const guestLikeState = new Map();
+    /*
+     * GUEST LIKES
+     *
+     * Guest likes are represented by LIKE / UNLIKE
+     * events in store_events.
+     *
+     * We reconstruct the current state by taking
+     * the latest event for each session/product pair.
+     */
+    const guestLikeState =
+      new Map();
 
     [...storeEvents]
       .filter(
         (event) =>
           !event.user_id &&
           event.product_id &&
-          (event.event_type === "LIKE" ||
-            event.event_type === "UNLIKE")
+          (event.event_type ===
+            "LIKE" ||
+            event.event_type ===
+              "UNLIKE")
       )
       .sort(
         (a, b) =>
@@ -711,7 +773,8 @@ export default function AdminDashboard() {
       )
       .forEach((event) => {
         const actor =
-          event.session_id || event.id;
+          event.session_id ||
+          event.id;
 
         if (!actor) return;
 
@@ -720,14 +783,15 @@ export default function AdminDashboard() {
 
         guestLikeState.set(
           key,
-          event.event_type === "LIKE"
+          event.event_type ===
+            "LIKE"
         );
       });
 
     const activeGuestLikes =
-      [...guestLikeState.values()].filter(
-        Boolean
-      ).length;
+      [
+        ...guestLikeState.values(),
+      ].filter(Boolean).length;
 
     const activeLikes =
       authenticatedLikeKeys.size +
@@ -736,15 +800,24 @@ export default function AdminDashboard() {
     return {
       visitors:
         visitorSessions.size,
+
       productViews,
+
       activeLikes,
+
       cartAdds,
     };
   }, [
     rangeStoreEvents,
     productLikes,
+    storeEvents,
   ]);
 
+  /*
+   * =====================================================
+   * REVENUE CHART
+   * =====================================================
+   */
   const chartData = useMemo(
     () =>
       buildChartData(
@@ -765,6 +838,11 @@ export default function AdminDashboard() {
     return max || 1;
   }, [chartData]);
 
+  /*
+   * =====================================================
+   * TOP PRODUCTS
+   * =====================================================
+   */
   const topProducts = useMemo(() => {
     const productMap = new Map();
 
@@ -833,6 +911,11 @@ export default function AdminDashboard() {
     rangeOrders,
   ]);
 
+  /*
+   * =====================================================
+   * LOW STOCK
+   * =====================================================
+   */
   const lowStockProducts =
     useMemo(
       () =>
@@ -855,6 +938,11 @@ export default function AdminDashboard() {
       [products]
     );
 
+  /*
+   * =====================================================
+   * RECENT ORDERS
+   * =====================================================
+   */
   const recentOrders = useMemo(
     () =>
       validOrders.slice(0, 6),
@@ -964,6 +1052,9 @@ export default function AdminDashboard() {
         </span>
       </div>
 
+      {/* =================================================
+          TOP STAT CARDS
+          ================================================= */}
       <div className="dashboard-stats">
         <StatCard
           label="Revenue"
@@ -972,14 +1063,11 @@ export default function AdminDashboard() {
           )}
           icon={Wallet}
           detail={`${rangeOrders.length} order${
-            rangeOrders.length ===
-            1
+            rangeOrders.length === 1
               ? ""
               : "s"
           }`}
-          trend={
-            revenueChange
-          }
+          trend={revenueChange}
         />
 
         <StatCard
@@ -989,9 +1077,7 @@ export default function AdminDashboard() {
           )}
           icon={ShoppingBag}
           detail="Completed store activity"
-          trend={
-            orderChange
-          }
+          trend={orderChange}
         />
 
         <StatCard
@@ -1013,6 +1099,9 @@ export default function AdminDashboard() {
         />
       </div>
 
+      {/* =================================================
+          STORE ACTIVITY
+          ================================================= */}
       <div className="dashboard-section-heading">
         <div>
           <span>
@@ -1067,6 +1156,9 @@ export default function AdminDashboard() {
         />
       </div>
 
+      {/* =================================================
+          REVENUE + TOP PRODUCTS
+          ================================================= */}
       <div className="dashboard-main-grid">
         <section className="dashboard-panel dashboard-chart-panel">
           <div className="dashboard-panel-heading">
@@ -1237,6 +1329,9 @@ export default function AdminDashboard() {
         </section>
       </div>
 
+      {/* =================================================
+          LOW STOCK + RECENT ORDERS
+          ================================================= */}
       <div className="dashboard-bottom-grid">
         <section className="dashboard-panel">
           <div className="dashboard-panel-heading">
