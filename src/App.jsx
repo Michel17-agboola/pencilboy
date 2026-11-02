@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -34,7 +34,6 @@ import { slugify } from "./lib/format";
 import { fetchStoreCatalogue } from "./lib/catalogue";
 import { setPageMeta } from "./lib/seo";
 import NotFound from "./pages/NotFound";
-
 
 function readStorage(key, fallback = []) {
   try {
@@ -88,6 +87,8 @@ export default function App() {
   const [route, navigate] = useHashRoute();
 
   const baseRoute = route.split("?")[0];
+
+  const likeOperationsRef = useRef(new Set());
 
   useEffect(() => {
     const titles = {
@@ -194,6 +195,50 @@ export default function App() {
 
   /*
    * -------------------------------------------------------
+   * LOAD AUTHENTICATED USER LIKES
+   * -------------------------------------------------------
+   *
+   * When a user signs in, load their actual persistent
+   * likes from Supabase so the heart state matches the
+   * database.
+   */
+
+  const loadUserLikes = async (userId) => {
+    if (!userId) {
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("product_likes")
+        .select("product_id")
+        .eq("user_id", userId);
+
+      if (error) {
+        console.warn(
+          "PENCILBOY: Could not load saved products.",
+          error.message
+        );
+        return;
+      }
+
+      const databaseLikes = Array.isArray(data)
+        ? data
+            .map((item) => item.product_id)
+            .filter(Boolean)
+        : [];
+
+      setSaved(databaseLikes);
+    } catch (error) {
+      console.warn(
+        "PENCILBOY: Could not load saved products.",
+        error
+      );
+    }
+  };
+
+  /*
+   * -------------------------------------------------------
    * LOAD STORE
    * -------------------------------------------------------
    */
@@ -207,12 +252,20 @@ export default function App() {
           await supabase.auth.getUser();
 
         if (!authResult.error) {
-          setUser(
-            authResult.data?.user || null
-          );
+          const currentUser =
+            authResult.data?.user || null;
+
+          setUser(currentUser);
+
+          if (currentUser?.id) {
+            await loadUserLikes(
+              currentUser.id
+            );
+          }
         }
 
-        const catalogue = await fetchStoreCatalogue();
+        const catalogue =
+          await fetchStoreCatalogue();
 
         if (catalogue.products.length) {
           setProducts(catalogue.products);
@@ -224,10 +277,33 @@ export default function App() {
 
         const authListener =
           supabase.auth.onAuthStateChange(
-            (_event, session) => {
-              setUser(
-                session?.user || null
-              );
+            (event, session) => {
+              const nextUser =
+                session?.user || null;
+
+              setUser(nextUser);
+
+              if (
+                event === "SIGNED_IN" &&
+                nextUser?.id
+              ) {
+                /*
+                 * Avoid doing the Supabase query directly
+                 * inside the auth callback.
+                 */
+                window.setTimeout(() => {
+                  loadUserLikes(
+                    nextUser.id
+                  );
+                }, 0);
+              }
+
+              if (event === "SIGNED_OUT") {
+                setSaved([]);
+                localStorage.removeItem(
+                  "pencilboy_saved"
+                );
+              }
             }
           );
 
@@ -280,63 +356,103 @@ export default function App() {
    *
    * Persist the like while keeping the UI state local
    * for an immediate response.
+   *
+   * A per-product lock prevents multiple rapid clicks
+   * from sending conflicting requests at the same time.
    */
 
   const onSave = async (id) => {
     if (!id) {
       return;
     }
-  
+
+    if (
+      likeOperationsRef.current.has(id)
+    ) {
+      return;
+    }
+
     const isCurrentlySaved =
       saved.includes(id);
-  
+
+    const shouldSave =
+      !isCurrentlySaved;
+
+    likeOperationsRef.current.add(id);
+
     /*
-     * Update the UI immediately so the heart
-     * feels instant.
+     * Update the UI immediately.
      */
-    setSaved((current) =>
-      isCurrentlySaved
+    setSaved((current) => {
+      const alreadySaved =
+        current.includes(id);
+
+      if (shouldSave) {
+        return alreadySaved
+          ? current
+          : [...current, id];
+      }
+
+      return alreadySaved
         ? current.filter(
             (item) => item !== id
           )
-        : [...current, id]
-    );
-  
-    /*
-     * Persist the like in Supabase.
-     */
-    if (isCurrentlySaved) {
-      const success =
-        await removeProductLike(id);
-  
+        : current;
+    });
+
+    try {
+      const success = shouldSave
+        ? await saveProductLike(id)
+        : await removeProductLike(id);
+
       /*
-       * If Supabase failed, restore the
-       * previous UI state.
+       * If persistence failed, roll the UI back.
        */
       if (!success) {
-        setSaved((current) =>
-          current.includes(id)
+        setSaved((current) => {
+          const alreadySaved =
+            current.includes(id);
+
+          if (shouldSave) {
+            return alreadySaved
+              ? current.filter(
+                  (item) => item !== id
+                )
+              : current;
+          }
+
+          return alreadySaved
             ? current
-            : [...current, id]
-        );
+            : [...current, id];
+        });
       }
-    } else {
-      const success =
-        await saveProductLike(id);
-  
-      /*
-       * If Supabase failed, restore the
-       * previous UI state.
-       */
-      if (!success) {
-        setSaved((current) =>
-          current.filter(
-            (item) => item !== id
-          )
-        );
-      }
+    } catch (error) {
+      console.warn(
+        "PENCILBOY: Like operation failed.",
+        error
+      );
+
+      setSaved((current) => {
+        const alreadySaved =
+          current.includes(id);
+
+        if (shouldSave) {
+          return alreadySaved
+            ? current.filter(
+                (item) => item !== id
+              )
+            : current;
+        }
+
+        return alreadySaved
+          ? current
+          : [...current, id];
+      });
+    } finally {
+      likeOperationsRef.current.delete(id);
     }
   };
+
   /*
    * -------------------------------------------------------
    * ADD TO CART
@@ -427,7 +543,8 @@ export default function App() {
       productRouteSlug
     );
   } catch {
-    decodedProductSlug = productRouteSlug;
+    decodedProductSlug =
+      productRouteSlug;
   }
 
   const normalizedProductSlug =
@@ -672,7 +789,11 @@ export default function App() {
           </section>
         );
       } else {
-        page = <NotFound navigate={navigate} />;
+        page = (
+          <NotFound
+            navigate={navigate}
+          />
+        );
       }
 
       break;

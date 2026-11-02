@@ -21,16 +21,11 @@ export function getSessionId() {
   }
 
   try {
-    let sessionId =
-      localStorage.getItem(SESSION_KEY);
+    let sessionId = localStorage.getItem(SESSION_KEY);
 
     if (!sessionId) {
       sessionId = createSessionId();
-
-      localStorage.setItem(
-        SESSION_KEY,
-        sessionId
-      );
+      localStorage.setItem(SESSION_KEY, sessionId);
     }
 
     return sessionId;
@@ -41,38 +36,46 @@ export function getSessionId() {
 
 async function getCurrentUserId() {
   try {
-    const { data } =
-      await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    return data?.user?.id || null;
+    return user?.id || null;
   } catch {
     return null;
   }
 }
 
-export async function trackEvent(
-  eventType,
-  options = {}
-) {
+/**
+ * Generic storefront event tracker.
+ *
+ * Supported events currently include:
+ * VISITOR
+ * PRODUCT_VIEW
+ * CART_ADD
+ * LIKE
+ * UNLIKE
+ */
+export async function trackEvent(eventType, options = {}) {
+  if (!eventType) {
+    return false;
+  }
+
   try {
     const sessionId = getSessionId();
-    const userId =
-      await getCurrentUserId();
+    const userId = await getCurrentUserId();
 
     const payload = {
       event_type: eventType,
-      product_id:
-        options.productId || null,
+      product_id: options.productId || null,
       session_id: sessionId,
       user_id: userId,
-      metadata:
-        options.metadata || {},
+      metadata: options.metadata || {},
     };
 
-    const { error } =
-      await supabase
-        .from("store_events")
-        .insert(payload);
+    const { error } = await supabase
+      .from("store_events")
+      .insert(payload);
 
     if (error) {
       console.warn(
@@ -94,25 +97,29 @@ export async function trackEvent(
   }
 }
 
+/**
+ * Track a storefront visitor.
+ */
 export async function trackVisitor() {
   return trackEvent("VISITOR");
 }
 
-export async function trackProductView(
-  productId
-) {
+/**
+ * Track a product page view.
+ */
+export async function trackProductView(productId) {
   if (!productId) {
     return false;
   }
 
-  return trackEvent(
-    "PRODUCT_VIEW",
-    {
-      productId,
-    }
-  );
+  return trackEvent("PRODUCT_VIEW", {
+    productId,
+  });
 }
 
+/**
+ * Track an item being added to cart.
+ */
 export async function trackCartAdd(
   productId,
   quantity = 1
@@ -121,27 +128,36 @@ export async function trackCartAdd(
     return false;
   }
 
-  return trackEvent(
-    "CART_ADD",
-    {
-      productId,
-      metadata: {
-        quantity:
-          Number(quantity) || 1,
-      },
-    }
-  );
+  return trackEvent("CART_ADD", {
+    productId,
+    metadata: {
+      quantity: Number(quantity) || 1,
+    },
+  });
 }
 
 /*
  * -------------------------------------------------------
- * PERSISTENT PRODUCT LIKES
+ * PRODUCT LIKES
  * -------------------------------------------------------
  *
- * Likes are stored in Supabase so the Admin Dashboard
- * can see the real number of active likes.
+ * Authenticated users:
+ *   - Likes are persisted in product_likes.
+ *
+ * Guests:
+ *   - The actual saved/liked state remains localStorage
+ *     controlled by the storefront.
+ *   - Analytics events may still be recorded in
+ *     store_events when Supabase permits the insert.
+ *
+ * IMPORTANT:
+ * The function only returns true when the actual
+ * requested operation succeeds.
  */
 
+/**
+ * Save/like a product.
+ */
 export async function saveProductLike(productId) {
   if (!productId) {
     return false;
@@ -151,10 +167,11 @@ export async function saveProductLike(productId) {
     const userId = await getCurrentUserId();
 
     /*
-     * Guests keep saved products locally.
-     * Do not persist guest likes to Supabase because
-     * client-generated session IDs are not a trusted
-     * security boundary.
+     * Guest users:
+     *
+     * The App/localStorage controls the actual saved
+     * product state. We only record the analytics event
+     * here.
      */
     if (!userId) {
       await trackEvent("LIKE", {
@@ -164,25 +181,24 @@ export async function saveProductLike(productId) {
       return true;
     }
 
-    const payload = {
-      product_id: productId,
-      user_id: userId,
-    };
-
+    /*
+     * Authenticated users:
+     * Persist the like in Supabase.
+     */
     const { error } = await supabase
       .from("product_likes")
-      .insert(payload);
+      .upsert(
+        {
+          product_id: productId,
+          user_id: userId,
+        },
+        {
+          onConflict: "user_id,product_id",
+          ignoreDuplicates: true,
+        }
+      );
 
-    /*
-     * If the like already exists, don't treat it
-     * as a fatal error.
-     */
-    if (
-      error &&
-      !String(error.message || "")
-        .toLowerCase()
-        .includes("duplicate")
-    ) {
+    if (error) {
       console.warn(
         "PENCILBOY like save:",
         error.message
@@ -191,6 +207,11 @@ export async function saveProductLike(productId) {
       return false;
     }
 
+    /*
+     * Record analytics separately.
+     * Failure here should not undo an already successful
+     * persistent like.
+     */
     await trackEvent("LIKE", {
       productId,
     });
@@ -206,6 +227,9 @@ export async function saveProductLike(productId) {
   }
 }
 
+/**
+ * Remove/unlike a product.
+ */
 export async function removeProductLike(productId) {
   if (!productId) {
     return false;
@@ -215,8 +239,10 @@ export async function removeProductLike(productId) {
     const userId = await getCurrentUserId();
 
     /*
-     * Guests keep saved products locally.
-     * There is no Supabase row to remove.
+     * Guest users:
+     *
+     * The actual saved state is controlled by the
+     * storefront/localStorage.
      */
     if (!userId) {
       await trackEvent("UNLIKE", {
@@ -226,6 +252,10 @@ export async function removeProductLike(productId) {
       return true;
     }
 
+    /*
+     * Authenticated users:
+     * Remove the persistent Supabase like.
+     */
     const { error } = await supabase
       .from("product_likes")
       .delete()
@@ -241,6 +271,9 @@ export async function removeProductLike(productId) {
       return false;
     }
 
+    /*
+     * Record the unlike event.
+     */
     await trackEvent("UNLIKE", {
       productId,
     });
@@ -257,27 +290,27 @@ export async function removeProductLike(productId) {
 }
 
 /*
- * Backwards-compatible tracking helpers.
+ * -------------------------------------------------------
+ * BACKWARDS-COMPATIBLE HELPERS
+ * -------------------------------------------------------
  */
 
-export async function trackLike(
-  productId
-) {
-  return trackEvent(
-    "LIKE",
-    {
-      productId,
-    }
-  );
+export async function trackLike(productId) {
+  if (!productId) {
+    return false;
+  }
+
+  return trackEvent("LIKE", {
+    productId,
+  });
 }
 
-export async function trackUnlike(
-  productId
-) {
-  return trackEvent(
-    "UNLIKE",
-    {
-      productId,
-    }
-  );
+export async function trackUnlike(productId) {
+  if (!productId) {
+    return false;
+  }
+
+  return trackEvent("UNLIKE", {
+    productId,
+  });
 }
