@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import "./pages/checkout-redesign.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";

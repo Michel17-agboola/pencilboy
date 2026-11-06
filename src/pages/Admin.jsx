@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search, Package, Tags, LogOut, Pencil, Trash2, X, Save, ArrowLeft, RefreshCw, Activity } from "lucide-react";
+import { Plus, Search, Package, Tags, LogOut, Pencil, Trash2, X, Save, ArrowLeft, RefreshCw, Activity, ShoppingBag } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import AdminDashboard from "./AdminDashboard";
+import Orders from "./Orders";
 import { formatNaira, slugify } from "../lib/format";
 import "../admin.css";
 
@@ -2401,6 +2402,18 @@ export default function Admin({
 
             Categories
           </button>
+
+          <button
+            className={
+              view === "orders"
+                ? "active"
+                : ""
+            }
+            onClick={() => setView("orders")}
+          >
+            <ShoppingBag size={17} />
+            Orders
+          </button>
         </aside>
 
         <section className="admin-content">
@@ -2621,6 +2634,8 @@ export default function Admin({
               }
             />
           )}
+
+          {view === "orders" && <Orders />}
         </section>
       </div>
     </main>

@@ -28,6 +28,19 @@ const EXCLUDED_STATUSES = [
   "REFUNDED",
 ];
 
+const REVENUE_STATUSES = new Set([
+  "APPROVED",
+  "PROCESSING",
+  "SHIPPED",
+  "DELIVERED",
+]);
+
+function isRevenueConfirmed(order) {
+  return REVENUE_STATUSES.has(
+    String(order?.status || "PENDING").toUpperCase()
+  );
+}
+
 const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
   { key: "7d", label: "7 Days" },
@@ -322,6 +335,31 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [updatingOrderId, setUpdatingOrderId] = useState("");
+
+  async function updateOrderStatus(orderId, status) {
+    setUpdatingOrderId(orderId);
+    setError("");
+
+    const { error: updateError } = await supabase
+      .from("orders")
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq("id", orderId);
+
+    if (updateError) {
+      setError(getReadableError(updateError, "Update order status"));
+    } else {
+      setOrders((current) =>
+        current.map((order) =>
+          order.id === orderId
+            ? { ...order, status, updated_at: new Date().toISOString() }
+            : order
+        )
+      );
+    }
+
+    setUpdatingOrderId("");
+  }
 
   async function loadDashboard(showRefresh = false) {
     if (showRefresh) {
@@ -589,24 +627,35 @@ export default function AdminDashboard() {
       startDate,
     ]);
 
+  // Pending orders are enquiries awaiting payment verification, not revenue.
+  const confirmedRangeOrders = useMemo(
+    () => rangeOrders.filter(isRevenueConfirmed),
+    [rangeOrders]
+  );
+
+  const confirmedPreviousRangeOrders = useMemo(
+    () => previousRangeOrders.filter(isRevenueConfirmed),
+    [previousRangeOrders]
+  );
+
   const revenue = useMemo(
     () =>
-      rangeOrders.reduce(
+      confirmedRangeOrders.reduce(
         (sum, order) =>
           sum + getOrderTotal(order),
         0
       ),
-    [rangeOrders]
+    [confirmedRangeOrders]
   );
 
   const previousRevenue = useMemo(
     () =>
-      previousRangeOrders.reduce(
+      confirmedPreviousRangeOrders.reduce(
         (sum, order) =>
           sum + getOrderTotal(order),
         0
       ),
-    [previousRangeOrders]
+    [confirmedPreviousRangeOrders]
   );
 
   const revenueChange = useMemo(() => {
@@ -821,10 +870,10 @@ export default function AdminDashboard() {
   const chartData = useMemo(
     () =>
       buildChartData(
-        rangeOrders,
+        confirmedRangeOrders,
         range
       ),
-    [rangeOrders, range]
+    [confirmedRangeOrders, range]
   );
 
   const chartMax = useMemo(() => {
@@ -847,7 +896,7 @@ export default function AdminDashboard() {
     const productMap = new Map();
 
     const rangeOrderIds = new Set(
-      rangeOrders.map(
+      confirmedRangeOrders.map(
         (order) => order.id
       )
     );
@@ -908,7 +957,7 @@ export default function AdminDashboard() {
       .slice(0, 5);
   }, [
     orderItems,
-    rangeOrders,
+    confirmedRangeOrders,
   ]);
 
   /*
@@ -1062,10 +1111,8 @@ export default function AdminDashboard() {
             revenue
           )}
           icon={Wallet}
-          detail={`${rangeOrders.length} order${
-            rangeOrders.length === 1
-              ? ""
-              : "s"
+          detail={`${confirmedRangeOrders.length} verified order${
+            confirmedRangeOrders.length === 1 ? "" : "s"
           }`}
           trend={revenueChange}
         />
@@ -1409,78 +1456,131 @@ export default function AdminDashboard() {
           )}
         </section>
 
-        <section className="dashboard-panel">
+        <section className="dashboard-panel dashboard-recent-orders">
           <div className="dashboard-panel-heading">
             <div>
-              <span>
-                STORE ACTIVITY
-              </span>
-
-              <h3>
-                Recent Orders
-              </h3>
+              <span>STORE ACTIVITY</span>
+              <h3>Recent Orders</h3>
+              <p className="dashboard-orders-subtitle">
+                Your latest customer purchases
+              </p>
             </div>
-
-            <Clock3
-              size={20}
-              strokeWidth={1.4}
-            />
+            <Clock3 size={20} strokeWidth={1.4} />
           </div>
 
-          {recentOrders.length ===
-          0 ? (
+          {recentOrders.length === 0 ? (
             <div className="dashboard-empty">
               <ShoppingBag size={22} />
-
-              <p>
-                No orders have
-                been placed yet.
-              </p>
+              <p>No orders have been placed yet.</p>
             </div>
           ) : (
             <div className="dashboard-orders-list">
-              {recentOrders.map(
-                (order) => (
-                  <div
-                    className="dashboard-order-row"
-                    key={
-                      order.id
-                    }
-                  >
-                    <div>
-                      <strong>
-                        {order.customer_name ||
-                          order.email ||
-                          "Guest Customer"}
-                      </strong>
+              {recentOrders.map((order) => {
+                const status = String(order.status || "PENDING").toUpperCase();
+                const items = orderItems.filter(
+                  (item) => item.order_id === order.id
+                );
 
-                      <small>
-                        {formatDate(
-                          order.created_at
-                        )}
-                      </small>
+                return (
+                  <article className="dashboard-order-card" key={order.id}>
+                    <div className="dashboard-order-card-header">
+                      <div className="dashboard-order-customer">
+                        <span className="dashboard-order-avatar">
+                          {(order.customer_name || order.email || "G")
+                            .charAt(0)
+                            .toUpperCase()}
+                        </span>
+                        <div>
+                          <strong>{order.customer_name || "Guest Customer"}</strong>
+                          <small>{order.email || "No email provided"}</small>
+                        </div>
+                      </div>
+
+                      <div className="dashboard-order-total">
+                        <small>ORDER TOTAL</small>
+                        <strong>{formatNaira(order.total)}</strong>
+                      </div>
                     </div>
 
-                    <div className="dashboard-order-right">
-                      <strong>
-                        {formatNaira(
-                          order.total
-                        )}
-                      </strong>
-
-                      <span
-                        className={`dashboard-order-status ${String(
-                          order.status ||
-                            "PENDING"
-                        ).toLowerCase()}`}
-                      >
-                        {order.status ||
-                          "PENDING"}
+                    <div className="dashboard-order-meta">
+                      <span>
+                        <small>ORDER ID</small>
+                        <strong>#{String(order.id).slice(-8).toUpperCase()}</strong>
+                      </span>
+                      <span>
+                        <small>DATE</small>
+                        <strong>{formatDate(order.created_at)}</strong>
+                      </span>
+                      <span>
+                        <small>PHONE</small>
+                        <strong>{order.phone || "Not provided"}</strong>
                       </span>
                     </div>
-                  </div>
-                )
-              )}
+
+                    <div className="dashboard-order-products">
+                      <small className="dashboard-order-section-label">
+                        ITEMS ORDERED
+                      </small>
+                      {items.length > 0 ? (
+                        items.map((item) => (
+                          <div className="dashboard-order-item" key={item.id}>
+                            <span>{item.product_name || "Product"}</span>
+                            <strong>
+                              × {item.quantity}
+                              {item.size ? ` · ${item.size}` : ""}
+                            </strong>
+                          </div>
+                        ))
+                      ) : (
+                        <small className="dashboard-order-no-items">
+                          No item details available.
+                        </small>
+                      )}
+                    </div>
+
+                    <div className="dashboard-order-card-footer">
+                      <div>
+                        <small>DELIVERY ADDRESS</small>
+                        <strong>
+                          {[order.shipping_address, order.city]
+                            .filter(Boolean)
+                            .join(", ") || "Not provided"}
+                        </strong>
+                      </div>
+
+                      <div className="dashboard-order-actions">
+                        <span
+                          className={`dashboard-order-status ${status.toLowerCase()}`}
+                        >
+                          {status}
+                        </span>
+                        <select
+                          aria-label={`Update order ${order.id} status`}
+                          value={order.status || "PENDING"}
+                          disabled={updatingOrderId === order.id}
+                          onChange={(event) =>
+                            updateOrderStatus(order.id, event.target.value)
+                          }
+                        >
+                          {[
+                            "PENDING",
+                            "APPROVED",
+                            "PROCESSING",
+                            "SHIPPED",
+                            "DELIVERED",
+                            "CANCELLED",
+                          ].map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                        {updatingOrderId === order.id && <small>Saving...</small>}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
